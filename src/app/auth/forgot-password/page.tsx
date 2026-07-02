@@ -33,9 +33,9 @@ export default function ForgotPasswordPage() {
       <header className="flex items-center justify-between px-4 py-3" style={{ backgroundColor: '#1e293b' }}>
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: '#16a34a' }}>
-            KS
+            HD
           </div>
-          <span className="text-white font-bold text-base">Kogelo Suites</span>
+          <span className="text-white font-bold text-base">HostDash</span>
         </div>
       </header>
 

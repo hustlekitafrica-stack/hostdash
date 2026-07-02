@@ -5,7 +5,7 @@ const DEFAULT_TEMPLATES = [
   {
     key: 'review_request',
     label: 'Review Request (to Guest)',
-    body: "Hi {{first_name}}! Thank you for staying with us. We'd love your feedback - please leave a quick review: {{review_url}} - Kogelo Suites",
+    body: "Hi {{first_name}}! Thank you for staying with us. We'd love your feedback - please leave a quick review: {{review_url}} - HostDash",
     variables: ['first_name','review_url'],
   },
 ];

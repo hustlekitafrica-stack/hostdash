@@ -1,7 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
-const AUTH_ROUTES = ['/auth/login', '/auth/register', '/auth/forgot-password'];
+const AUTH_ROUTES   = ['/auth/login', '/auth/register', '/auth/forgot-password'];
+const PUBLIC_ROUTES = ['/upgrade', '/upgrade/callback', '/api/pesapal/ipn'];
 
 const PROTECTED_PREFIXES = [
   '/dashboard', '/properties', '/booking-calendar', '/guests',
@@ -43,8 +44,15 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  const isProtected = PROTECTED_PREFIXES.some(p => url.pathname.startsWith(p));
-  const isAuthRoute = AUTH_ROUTES.some(p => url.pathname.startsWith(p));
+  const isProtected  = PROTECTED_PREFIXES.some(p => url.pathname.startsWith(p));
+  const isAuthRoute   = AUTH_ROUTES.some(p => url.pathname.startsWith(p));
+  const isPublicRoute = PUBLIC_ROUTES.some(p => url.pathname.startsWith(p));
+
+  // Public routes (upgrade page, IPN webhook) — never redirect
+  if (isPublicRoute) {
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return response;
+  }
 
   // Unauthenticated user trying to access a protected route → login
   if (!user && isProtected) {

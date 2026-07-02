@@ -18,7 +18,7 @@ export function Sidebar({ isOpen = true, onClose, isMobile = false }: SidebarPro
   const [alertCount, setAlertCount] = useState(0);
 
   useEffect(() => {
-    const email = localStorage.getItem('user_email') || 'admin@kogelosuites.com';
+    const email = localStorage.getItem('user_email') || 'admin@hostdash.app';
     setUserEmail(email);
     const applyLocal = () => {};
 
@@ -73,10 +73,10 @@ export function Sidebar({ isOpen = true, onClose, isMobile = false }: SidebarPro
               <img src={localStorage.getItem('brand_logo')!} alt="Logo" className="w-8 h-8 rounded-lg object-contain bg-white/10" />
             ) : (
               <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: '#9B1C1C' }}>
-                KS
+                HD
               </div>
             )}
-            <span className="text-white font-bold text-lg">Kogelo Suites</span>
+            <span className="text-white font-bold text-lg">HostDash</span>
           </div>
         )}
         {collapsed && (
@@ -85,7 +85,7 @@ export function Sidebar({ isOpen = true, onClose, isMobile = false }: SidebarPro
               <img src={localStorage.getItem('brand_logo')!} alt="Logo" className="w-8 h-8 rounded-lg object-contain bg-white/10" />
             ) : (
               <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: '#9B1C1C' }}>
-                KS
+                HD
               </div>
             )}
           </div>

@@ -23,7 +23,7 @@ END $$;
 INSERT INTO sms_templates (key, label, body, variables) VALUES
 ('booking_request_guest',
  'Booking Request (to Guest)',
- 'Hi {{first_name}}! Your booking request for {{property_name}} ({{check_in}} - {{check_out}}, {{nights}} night{{nights_s}}) has been received. Ref: {{ref}}. Our team will confirm within 2 hours. - Kogelo Suites',
+ 'Hi {{first_name}}! Your booking request for {{property_name}} ({{check_in}} - {{check_out}}, {{nights}} night{{nights_s}}) has been received. Ref: {{ref}}. Our team will confirm within 2 hours. - HostDash',
  ARRAY['first_name','property_name','check_in','check_out','nights','nights_s','ref']),
 
 ('booking_request_admin',
@@ -33,17 +33,17 @@ INSERT INTO sms_templates (key, label, body, variables) VALUES
 
 ('booking_accepted',
  'Booking Accepted (to Guest)',
- 'Great news {{first_name}}! Your booking for {{property_name}} ({{check_in}} - {{check_out}}) has been ACCEPTED. Total: KSh {{total}}.{{payment_line}} - Kogelo Suites',
+ 'Great news {{first_name}}! Your booking for {{property_name}} ({{check_in}} - {{check_out}}) has been ACCEPTED. Total: KSh {{total}}.{{payment_line}} - HostDash',
  ARRAY['first_name','property_name','check_in','check_out','total','payment_line']),
 
 ('booking_declined',
  'Booking Declined (to Guest)',
- 'Hi {{first_name}}, we regret your booking for {{property_name}} ({{check_in}} - {{check_out}}) could not be accommodated.{{reason_line}}{{call_line}} - Kogelo Suites',
+ 'Hi {{first_name}}, we regret your booking for {{property_name}} ({{check_in}} - {{check_out}}) could not be accommodated.{{reason_line}}{{call_line}} - HostDash',
  ARRAY['first_name','property_name','check_in','check_out','reason_line','call_line']),
 
 ('review_request',
  'Review Request (to Guest)',
- 'Hi {{first_name}}! Thank you for staying with us. We''d love your feedback - please leave a quick review: {{review_url}} - Kogelo Suites',
+ 'Hi {{first_name}}! Thank you for staying with us. We''d love your feedback - please leave a quick review: {{review_url}} - HostDash',
  ARRAY['first_name','review_url'])
 
 ON CONFLICT (key) DO NOTHING;

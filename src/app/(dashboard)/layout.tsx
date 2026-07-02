@@ -8,6 +8,7 @@ import { MobileNav } from '@/components/navigation/MobileNav';
 import { MobileHeader } from '@/components/navigation/MobileHeader';
 import { Backdrop } from '@/components/navigation/Backdrop';
 import { BrandProvider } from '@/components/providers/BrandProvider';
+import { TrialBanner } from '@/components/trial/TrialBanner';
 
 export default function DashboardLayout({
   children,
@@ -29,6 +30,18 @@ export default function DashboardLayout({
         router.push('/auth/login');
         return;
       }
+
+      try {
+        const res  = await fetch('/api/subscription');
+        const sub  = res.ok ? await res.json() as { is_expired?: boolean; is_paid?: boolean } : null;
+        if (sub?.is_expired && !sub?.is_paid) {
+          router.push('/upgrade');
+          return;
+        }
+      } catch {
+        // non-fatal — let user in if subscription check fails
+      }
+
       setIsLoading(false);
     };
     checkAuth();
@@ -98,6 +111,9 @@ export default function DashboardLayout({
 
         {/* Mobile Navigation - Visible only on mobile & tablet */}
         <MobileNav />
+
+        {/* Trial / expiry banner */}
+        <TrialBanner />
 
         {/* Page content - Add top padding on mobile to account for header + action buttons */}
         <main className={`flex-1 overflow-y-auto overflow-x-hidden lg:pt-0 pb-4 sm:pb-0 ${['/booking-calendar','/alerts','/guests','/unit-performance','/properties','/expenses','/reports','/settings','/help'].includes(pathname) ? 'pt-0' : 'pt-20'}`}>

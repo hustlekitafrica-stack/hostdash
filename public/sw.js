@@ -174,7 +174,7 @@ async function syncPayments() {
 // Push notifications
 self.addEventListener('push', (event) => {
   const data = event.data?.json() ?? {};
-  const title = data.title || 'Kogelo Suites';
+  const title = data.title || 'HostDash';
   const options = {
     body: data.body || 'You have a new notification',
     icon: '/icons/icon-192x192.png',

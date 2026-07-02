@@ -30,7 +30,7 @@ export const MENU_TABS: { id: MenuCategory['tab']; label: string; emoji: string 
 export const MENU_DATA: MenuCategory[] = [
   {
     id: 'healthy',
-    name: 'Kogelo Goes Healthy',
+    name: 'Healthy Breakfast',
     tab: 'breakfast',
     items: [
       { id: 'h1', name: 'Liver',            price: 250 },
@@ -92,8 +92,8 @@ export const MENU_DATA: MenuCategory[] = [
     tab: 'mains',
     description: 'Served with vegetables and a choice of ugali, rice or chapati',
     items: [
-      { id: 'm1', name: '¼ Traditional Chicken',     price: 600,  description: 'Free range chicken made the Kogelo way — wet fry, dry fry, pan fry, stew or boiled', tag: 'popular' },
-      { id: 'm2', name: '1 Full Traditional Chicken', price: 2400, description: 'Free range chicken made the Kogelo way — wet fry, dry fry, pan fry, stew or boiled', tag: 'special' },
+      { id: 'm1', name: '¼ Traditional Chicken',     price: 600,  description: 'Free range chicken — wet fry, dry fry, pan fry, stew or boiled', tag: 'popular' },
+      { id: 'm2', name: '1 Full Traditional Chicken', price: 2400, description: 'Free range chicken — wet fry, dry fry, pan fry, stew or boiled', tag: 'special' },
       { id: 'm3', name: '¼ African Beef',            price: 600,  description: 'Tender beef cubes cooked with local and natural spices — wetfry, pan fry, stew or boiled', tag: 'popular' },
       { id: 'm4', name: '¼ Goat Meat',               price: 600,  description: 'Soft, flavourful goat meat cooked the local way — wetfry, pan fry, stew or boiled' },
       { id: 'm5', name: '¼ Pork',                    price: 600,  description: 'Juicy pork prepared with rich seasoning — wetfry, pan fry, stew or boiled' },

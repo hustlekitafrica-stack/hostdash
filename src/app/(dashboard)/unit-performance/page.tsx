@@ -57,7 +57,7 @@ export default function UnitPerformancePage() {
   }, []);
 
   useEffect(() => {
-    const email = localStorage.getItem('user_email') || 'admin@kogelosuites.com';
+    const email = localStorage.getItem('user_email') || 'admin@hostdash.app';
     setUserEmail(email);
   }, []);
 

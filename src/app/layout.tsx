@@ -22,16 +22,16 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: 'Kogelo Suites Admin',
-    template: '%s | Kogelo Suites Admin',
+    default: 'HostDash Admin',
+    template: '%s | HostDash Admin',
   },
-  description: 'Kogelo Suites property management dashboard.',
+  description: 'HostDash property management dashboard.',
   icons: { icon: '/favicon.ico' },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Kogelo Suites Admin',
+    title: 'HostDash Admin',
   },
   robots: { index: false, follow: false },
 };

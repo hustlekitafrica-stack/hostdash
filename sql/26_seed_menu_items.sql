@@ -4,16 +4,16 @@ DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM menu_items LIMIT 1) THEN
 
-    -- ── Breakfast: Kogelo Goes Healthy ────────────────────────────────────────
+    -- ── Breakfast: Healthy Breakfast ────────────────────────────────────────
     INSERT INTO menu_items (tab, category, name, description, price, tag, position, active) VALUES
-      ('breakfast', 'Kogelo Goes Healthy', 'Liver',            '',    250, NULL,      1, true),
-      ('breakfast', 'Kogelo Goes Healthy', 'Githeri (Nyoyo)', '',    200, NULL,      2, true),
-      ('breakfast', 'Kogelo Goes Healthy', 'Matoke',           '',    200, NULL,      3, true),
-      ('breakfast', 'Kogelo Goes Healthy', 'Rolex',            '',    200, NULL,      4, true),
-      ('breakfast', 'Kogelo Goes Healthy', 'Uji Power',        '',    200, NULL,      5, true),
-      ('breakfast', 'Kogelo Goes Healthy', 'Eggs (Pair)',       '',    200, NULL,      6, true),
-      ('breakfast', 'Kogelo Goes Healthy', 'Mandazi (5 pcs)',  '',    100, NULL,      7, true),
-      ('breakfast', 'Kogelo Goes Healthy', 'Chapati (1 pc)',   '',    50,  NULL,      8, true);
+      ('breakfast', 'Healthy Breakfast', 'Liver',            '',    250, NULL,      1, true),
+      ('breakfast', 'Healthy Breakfast', 'Githeri (Nyoyo)', '',    200, NULL,      2, true),
+      ('breakfast', 'Healthy Breakfast', 'Matoke',           '',    200, NULL,      3, true),
+      ('breakfast', 'Healthy Breakfast', 'Rolex',            '',    200, NULL,      4, true),
+      ('breakfast', 'Healthy Breakfast', 'Uji Power',        '',    200, NULL,      5, true),
+      ('breakfast', 'Healthy Breakfast', 'Eggs (Pair)',       '',    200, NULL,      6, true),
+      ('breakfast', 'Healthy Breakfast', 'Mandazi (5 pcs)',  '',    100, NULL,      7, true),
+      ('breakfast', 'Healthy Breakfast', 'Chapati (1 pc)',   '',    50,  NULL,      8, true);
 
     -- ── Breakfast: Full Traditional Breakfast Plate ────────────────────────────
     INSERT INTO menu_items (tab, category, name, description, price, tag, position, active) VALUES
@@ -40,8 +40,8 @@ BEGIN
 
     -- ── Mains ─────────────────────────────────────────────────────────────────
     INSERT INTO menu_items (tab, category, name, description, price, tag, position, active) VALUES
-      ('mains', 'Main Dishes', '¼ Traditional Chicken',      'Free range chicken made the Kogelo way — wet fry, dry fry, pan fry, stew or boiled',                                                            600,  'popular', 1,  true),
-      ('mains', 'Main Dishes', '1 Full Traditional Chicken', 'Free range chicken made the Kogelo way — wet fry, dry fry, pan fry, stew or boiled',                                                            2400, 'special', 2,  true),
+      ('mains', 'Main Dishes', '¼ Traditional Chicken',      'Free range chicken — wet fry, dry fry, pan fry, stew or boiled',                                                            600,  'popular', 1,  true),
+      ('mains', 'Main Dishes', '1 Full Traditional Chicken', 'Free range chicken — wet fry, dry fry, pan fry, stew or boiled',                                                            2400, 'special', 2,  true),
       ('mains', 'Main Dishes', '¼ African Beef',             'Tender beef cubes cooked with local and natural spices — wetfry, pan fry, stew or boiled',                                                      600,  'popular', 3,  true),
       ('mains', 'Main Dishes', '¼ Goat Meat',                'Soft, flavourful goat meat cooked the local way — wetfry, pan fry, stew or boiled',                                                             600,  NULL,      4,  true),
       ('mains', 'Main Dishes', '¼ Pork',                     'Juicy pork prepared with rich seasoning — wetfry, pan fry, stew or boiled',                                                                     600,  NULL,      5,  true),

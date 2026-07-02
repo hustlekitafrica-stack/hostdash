@@ -346,7 +346,7 @@ export default function IntegrationsPage() {
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    value="https://api.Kogelo Suites-ke.com/webhooks/events"
+                    value="https://api.hostdash.app/webhooks/events"
                     readOnly
                     className="flex-1 px-4 py-2 border border-blue-300 rounded-lg bg-white text-sm"
                   />

@@ -70,9 +70,9 @@ export function AuthForm({ mode }: AuthFormProps) {
             className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
             style={{ backgroundColor: '#16a34a' }}
           >
-            KS
+            HD
           </div>
-          <span className="text-white font-bold text-base">Kogelo Suites</span>
+          <span className="text-white font-bold text-base">HostDash</span>
         </div>
       </header>
 
@@ -82,8 +82,8 @@ export function AuthForm({ mode }: AuthFormProps) {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Sign in or create an account</h1>
           <p className="text-sm text-gray-500 mb-6">
             {isLogin
-              ? 'Sign in using your Kogelo Suites account to access property management.'
-              : 'Create your Kogelo Suites account to start managing your properties.'}
+              ? 'Sign in to your HostDash account to access property management.'
+              : 'Create your HostDash account to start managing your properties.'}
           </p>
 
           {step === 'email' ? (

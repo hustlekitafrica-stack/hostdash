@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
     const firstName = guest_name.split(' ')[0];
-    const smsMessage = `Hi ${firstName}! Thank you for staying with us at Kogelo Suites. We'd love your feedback — please contact us to share your experience. Thank you!`;
+    const smsMessage = `Hi ${firstName}! Thank you for staying with us at HostDash. We'd love your feedback — please contact us to share your experience. Thank you!`;
     const smsResult = await sendSms(normalizePhone(guest_phone), smsMessage);
 
     if (!smsResult.ok) console.error('[SMS review] error:', smsResult.error);

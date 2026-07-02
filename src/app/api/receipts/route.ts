@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
 
     const firstName  = guest_name.trim().split(' ')[0];
     const waText     = encodeURIComponent(
-      `Hi ${firstName}! 🧾 Here is your payment receipt from Kogelo Suites.\n\nReceipt No: ${data.receipt_number}\nAmount Paid: KSh ${paid.toLocaleString()}\n\nThank you for staying with us! – Kogelo Suites`
+      `Hi ${firstName}! 🧾 Here is your payment receipt from HostDash.\n\nReceipt No: ${data.receipt_number}\nAmount Paid: KSh ${paid.toLocaleString()}\n\nThank you for staying with us! – HostDash`
     );
     const whatsappLink = `https://wa.me/${guest_phone.trim().replace(/\D/g, '')}?text=${waText}`;
 

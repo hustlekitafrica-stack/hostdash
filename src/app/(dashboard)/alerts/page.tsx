@@ -96,7 +96,7 @@ export default function AlertsPage() {
   }, []);
 
   useEffect(() => {
-    setUserEmail(localStorage.getItem('user_email') || 'admin@kogelosuites.com');
+    setUserEmail(localStorage.getItem('user_email') || 'admin@hostdash.app');
   }, []);
 
   const loadData = useCallback(async () => {

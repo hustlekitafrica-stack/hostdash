@@ -123,7 +123,7 @@ export function buildGuestRequestSms(opts: {
 }): string {
   const { guestName, propertyName, checkIn, checkOut, nights, ref } = opts;
   const first = guestName.split(' ')[0];
-  return `Hi ${first}! 🏨 Your booking request for ${propertyName} (${checkIn} – ${checkOut}, ${nights} night${nights !== 1 ? 's' : ''}) has been received. Ref: ${ref.slice(0,8).toUpperCase()}. We will get back to you within 5 minutes. – Kogelo Suites`;
+  return `Hi ${first}! 🏨 Your booking request for ${propertyName} (${checkIn} – ${checkOut}, ${nights} night${nights !== 1 ? 's' : ''}) has been received. Ref: ${ref.slice(0,8).toUpperCase()}. We will get back to you within 5 minutes. – HostDash`;
 }
 
 export function buildAdminRequestSms(opts: {
@@ -141,7 +141,7 @@ export function buildGuestAcceptedSms(opts: {
   const { guestName, propertyName, checkIn, checkOut, total, paymentLink } = opts;
   const first = guestName.split(' ')[0];
   const payLine = paymentLink ? `\nPay here to confirm: ${paymentLink}` : '';
-  return `Great news ${first}! ✅ Your booking request for ${propertyName} (${checkIn} – ${checkOut}) has been ACCEPTED. To confirm your reservation, please make a full payment of KSh ${total.toLocaleString()}.${payLine} – Kogelo Suites`;
+  return `Great news ${first}! ✅ Your booking request for ${propertyName} (${checkIn} – ${checkOut}) has been ACCEPTED. To confirm your reservation, please make a full payment of KSh ${total.toLocaleString()}.${payLine} – HostDash`;
 }
 
 export function buildGuestDeclinedSms(opts: {
@@ -152,7 +152,7 @@ export function buildGuestDeclinedSms(opts: {
   const first   = guestName.split(' ')[0];
   const why     = reason ? ` Reason: ${reason}.` : '';
   const callUs  = adminPhone ? ` Call us on ${adminPhone} to explore alternatives.` : '';
-  return `Hi ${first}, we regret to inform you that your booking request for ${propertyName} (${checkIn} – ${checkOut}) could not be accommodated.${why}${callUs} – Kogelo Suites`;
+  return `Hi ${first}, we regret to inform you that your booking request for ${propertyName} (${checkIn} – ${checkOut}) could not be accommodated.${why}${callUs} – HostDash`;
 }
 
 export function buildGuestConfirmedSms(opts: {
@@ -162,7 +162,7 @@ export function buildGuestConfirmedSms(opts: {
 }): string {
   const { guestName, propertyName, checkIn, checkOut, nights, total, ref } = opts;
   const first = guestName.split(' ')[0];
-  return `🎉 Booking Confirmed, ${first}!\nProperty: ${propertyName}\nCheck-in: ${checkIn}  |  Check-out: ${checkOut} (${nights} nights)\nTotal Paid: KSh ${total.toLocaleString()}\nRef: ${ref.slice(0,8).toUpperCase()}\n💯 Fully refundable if cancelled 48h+ before check-in.\nWe look forward to hosting you! – Kogelo Suites`;
+  return `🎉 Booking Confirmed, ${first}!\nProperty: ${propertyName}\nCheck-in: ${checkIn}  |  Check-out: ${checkOut} (${nights} nights)\nTotal Paid: KSh ${total.toLocaleString()}\nRef: ${ref.slice(0,8).toUpperCase()}\n💯 Fully refundable if cancelled 48h+ before check-in.\nWe look forward to hosting you! – HostDash`;
 }
 
 export function buildAdminConfirmedSms(opts: {

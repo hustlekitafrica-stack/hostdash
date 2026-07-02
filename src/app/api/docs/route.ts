@@ -4,13 +4,13 @@ export async function GET() {
   const apiDocs = {
     openapi: '3.0.0',
     info: {
-      title: 'Kogelo Suites API',
+      title: 'HostDash API',
       description: 'Complete REST API for property management system',
       version: '1.0.0',
       contact: {
-        name: 'Kogelo Suites Support',
-        email: 'support@Kogelo Suites-ke.com',
-        url: 'https://Kogelo Suites-ke.com',
+        name: 'HostDash Support',
+        email: 'support@hostdash.app',
+        url: 'https://hostdash.app',
       },
     },
     servers: [
@@ -19,7 +19,7 @@ export async function GET() {
         description: 'Development server',
       },
       {
-        url: 'https://api.Kogelo Suites-ke.com',
+        url: 'https://api.hostdash.app',
         description: 'Production server',
       },
     ],

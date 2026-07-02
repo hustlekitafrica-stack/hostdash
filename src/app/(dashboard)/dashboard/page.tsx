@@ -191,7 +191,7 @@ export default function DashboardPage() {
           </button>
           </div>
           <div className="flex items-center gap-2 ml-3 flex-shrink-0">
-            <span className="text-xs text-gray-600">admin@kogelosuites.com</span>
+            <span className="text-xs text-gray-600">admin@hostdash.app</span>
           </div>
         </div>
       </div>

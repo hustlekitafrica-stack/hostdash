@@ -42,8 +42,8 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-white flex flex-col">
       <header className="flex items-center px-4 py-3" style={{ backgroundColor: '#1e293b' }}>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: '#16a34a' }}>KS</div>
-          <span className="text-white font-bold text-base">Kogelo Suites</span>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm" style={{ backgroundColor: '#16a34a' }}>HD</div>
+          <span className="text-white font-bold text-base">HostDash</span>
         </div>
       </header>
 

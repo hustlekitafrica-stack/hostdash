@@ -29,6 +29,19 @@ Booking request scenario:  Webhook → Email to guest (request received) → Ema
 Booking confirmed scenario: Webhook → Email to guest (booking confirmed) → Email to admin (booking confirmed).
 If either webhook env var is absent, that call is silently skipped.
 
+### PesaPal — Platform subscription payments
+
+```
+PESAPAL_CONSUMER_KEY=your_consumer_key          # From PesaPal merchant dashboard → API Keys
+PESAPAL_CONSUMER_SECRET=your_consumer_secret    # From PesaPal merchant dashboard → API Keys
+PESAPAL_IPN_ID=your_ipn_id                      # Register IPN URL in PesaPal dashboard → IPN Manager
+                                                 # IPN URL to register: https://yourdomain.com/api/pesapal/ipn
+NEXT_PUBLIC_APP_URL=https://yourdomain.com       # Used to build callback & IPN URLs (no trailing slash)
+```
+
+One-time charge: $45 USD (≈ KSh 6,000). Supports Visa, Mastercard, M-Pesa, Airtel Money.
+On payment confirmation PesaPal POSTs to `/api/pesapal/ipn` → sets `profiles.subscription_status = 'paid'`.
+
 ### SMS (Africa's Talking — legacy, kept for reference)
 
 ```

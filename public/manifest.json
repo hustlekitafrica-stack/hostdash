@@ -1,7 +1,7 @@
 {
-  "name": "Kogelo Suites - Property Management",
-  "short_name": "Kogelo Suites",
-  "description": "Kogelo Suites — Your home away from home in Kogelo, Kenya",
+  "name": "HostDash - Property Management",
+  "short_name": "HostDash",
+  "description": "HostDash — Property management made simple.",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",

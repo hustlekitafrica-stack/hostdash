@@ -17,7 +17,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-sm font-semibold text-emerald-400 uppercase tracking-widest">Admin Console</span>
           <span className="text-gray-600">·</span>
-          <span className="text-gray-400 text-sm">KogeloSuite</span>
+          <span className="text-gray-400 text-sm">HostDash</span>
         </div>
         <span className="text-xs text-gray-500">{session.user.email}</span>
       </header>

@@ -46,7 +46,7 @@ export function Header() {
             </svg>
           </button>
           <h1 className="text-xl font-bold text-surface-900 md:hidden">
-            Kogelo Suites
+            HostDash
           </h1>
         </div>
 

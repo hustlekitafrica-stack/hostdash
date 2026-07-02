@@ -60,10 +60,10 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-6 border-b border-surface-800">
         <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center font-bold text-lg">
-          KS
+          HD
         </div>
         <div>
-          <h1 className="font-bold text-lg">Kogelo Suites</h1>
+          <h1 className="font-bold text-lg">HostDash</h1>
           <p className="text-xs text-surface-400">Dashboard</p>
         </div>
       </div>
@@ -93,7 +93,7 @@ export function Sidebar() {
       {/* Footer */}
       <div className="border-t border-surface-800 p-4">
         <p className="text-xs text-surface-400 text-center">
-          © 2025 Kogelo Suites
+          © 2025 HostDash
         </p>
       </div>
     </aside>
