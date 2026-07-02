@@ -207,17 +207,16 @@ function LoginForm() {
           </button>
         </div>
 
-        {/* Help Link */}
+        {/* Create account */}
         <div className="mt-6 text-center">
-          <button
-            type="button"
-            className="text-sm font-medium transition-colors"
+          <span className="text-sm text-gray-500">Don&apos;t have an account?{' '}</span>
+          <Link
+            href="/auth/register"
+            className="text-sm font-semibold"
             style={{ color: '#16a34a' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#15803d')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#16a34a')}
           >
-            Having trouble signing in?
-          </button>
+            Create one
+          </Link>
         </div>
 
         {/* Footer */}
