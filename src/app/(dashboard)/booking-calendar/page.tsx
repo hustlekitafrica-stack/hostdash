@@ -1,11 +1,28 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import ChannelManagerTab from '@/components/channel-manager/ChannelManagerTab';
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const PILL_COLORS = ['#22c55e','#3b82f6','#f97316','#a855f7','#ec4899','#14b8a6','#eab308','#ef4444'];
 const SOURCES = ['Direct','Booking.com','Airbnb','Expedia','VRBO','Other'];
+const CHANNEL_BADGES: Record<string, string> = {
+  Airbnb: '✈️',
+  'Booking.com': '📅',
+  'Google Calendar': '📆',
+  Jiji: '🛒',
+  VRBO: '🏠',
+  Other: '🔗',
+};
+const CHANNEL_STRIPES: Record<string, string> = {
+  Airbnb: '#ef4444',
+  'Booking.com': '#3b82f6',
+  'Google Calendar': '#22c55e',
+  Jiji: '#f97316',
+  VRBO: '#a855f7',
+  Other: '#6b7280',
+};
 
 const PAYMENT_METHODS = [
   { value: 'mpesa',    icon: '📱', label: 'M-Pesa' },
@@ -39,6 +56,7 @@ interface Booking {
   booking_source: string;
   status: string;
   notes: string;
+  source_channel?: string | null;
 }
 
 const STEPS = ['Property & Dates', 'Guest Details', 'Pricing & Notes', 'Payment'];
@@ -156,7 +174,7 @@ export default function BookingCalendarPage() {
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState('all');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [userEmail, setUserEmail] = useState('');
+  const [activeTab, setActiveTab] = useState<'calendar' | 'channels'>('calendar');
 
   // Modal state
   const [modalMode, setModalMode] = useState<'closed' | 'create' | 'edit'>('closed');
@@ -177,10 +195,6 @@ export default function BookingCalendarPage() {
     return () => window.removeEventListener('sidebarToggle', h);
   }, []);
 
-  useEffect(() => {
-    const email = localStorage.getItem('user_email') || 'admin@kogelosuites.com';
-    setUserEmail(email);
-  }, []);
 
   useEffect(() => {
     if (modalMode !== 'closed') {
@@ -202,7 +216,8 @@ export default function BookingCalendarPage() {
     }
   }, [year, month]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
+  useEffect(() => { fetchData(); }, [year, month]);
 
   const prevMonth = () => {
     if (month === 0) { setYear(y => y - 1); setMonth(11); } else setMonth(m => m - 1);
@@ -284,8 +299,6 @@ export default function BookingCalendarPage() {
   };
 
   const handleSave = async () => {
-    const _nights = form.check_in && form.check_out && form.check_out > form.check_in
-      ? Math.round((parseDate(form.check_out).getTime() - parseDate(form.check_in).getTime()) / 86400000) : 0;
     const _rate = parseFloat(form.nightly_rate) || 0;
     const _clean = parseFloat(form.cleaning_fee) || 0;
     const _extra = parseFloat(form.extra_fees) || 0;
@@ -442,16 +455,36 @@ export default function BookingCalendarPage() {
       <div className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:pl-[280px] lg:pr-[200px]' : 'lg:pl-[456px] lg:pr-[200px]'}`}>
       <div className="px-2 py-4 sm:p-6 space-y-4 max-w-[1400px]">
 
-        {/* New Booking button */}
-        <div className="flex justify-end">
-          <button onClick={() => openCreate()} className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors whitespace-nowrap">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            New Booking
-          </button>
+        {/* Tab strip */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setActiveTab('calendar')}
+              className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${activeTab === 'calendar' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+            >
+              Calendar
+            </button>
+            <button
+              onClick={() => setActiveTab('channels')}
+              className={`px-4 py-2 text-sm font-semibold rounded-md transition-colors ${activeTab === 'channels' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+            >
+              Channels
+            </button>
+          </div>
+          {activeTab === 'calendar' && (
+            <button onClick={() => openCreate()} className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors whitespace-nowrap">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              New Booking
+            </button>
+          )}
         </div>
 
+        {activeTab === 'channels' && <ChannelManagerTab properties={properties} />}
+
+        {activeTab === 'calendar' && (
+          <>
         {/* Calendar Card */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
 
@@ -557,12 +590,14 @@ export default function BookingCalendarPage() {
                         const endCol = Math.min(6, dateDiff(week[0], co) - 1);
                         if (startCol > endCol) return null;
                         const isBlocked = b.status === 'blocked';
+                        const channel = b.source_channel ? CHANNEL_BADGES[b.source_channel] : null;
+                        const stripeColor = b.source_channel ? CHANNEL_STRIPES[b.source_channel] : undefined;
                         const color = isBlocked ? '#6b7280' : (colorMap[b.property_id] ?? '#9ca3af');
                         return (
                           <div
                             key={b.id}
                             onClick={(e) => { e.stopPropagation(); openEdit(b); }}
-                            className={`absolute text-white text-xs font-semibold px-2.5 rounded-full truncate cursor-pointer hover:opacity-90 transition-opacity z-10 select-none ${isBlocked ? 'opacity-70' : ''}`}
+                            className={`absolute text-white text-xs font-semibold pl-2 pr-2.5 rounded-full truncate cursor-pointer hover:opacity-90 transition-opacity z-10 select-none flex items-center gap-1 ${isBlocked ? 'opacity-70' : ''}`}
                             style={{
                               backgroundColor: color,
                               top: `${32 + bi * 26}px`,
@@ -570,9 +605,11 @@ export default function BookingCalendarPage() {
                               width: `calc(${((endCol - startCol + 1) / 7) * 100}% - 10px)`,
                               height: '22px',
                               lineHeight: '22px',
+                              borderLeft: stripeColor ? `4px solid ${stripeColor}` : undefined,
                             }}
                           >
-                            {isBlocked ? `🔒 ${b.guest_name}` : b.guest_name}
+                            {channel ? <span>{channel}</span> : isBlocked ? <span>🔒</span> : null}
+                            <span className="truncate">{b.guest_name}</span>
                           </div>
                         );
                       })}
@@ -621,6 +658,9 @@ export default function BookingCalendarPage() {
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center text-sm text-gray-400">
             No bookings for {MONTH_NAMES[month]} {year}
           </div>
+        )}
+
+          </>
         )}
 
       </div>

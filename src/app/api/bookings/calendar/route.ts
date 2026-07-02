@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const from = new Date(year, month, 1).toISOString().split('T')[0];
     const to = new Date(year, month + 1, 0).toISOString().split('T')[0];
 
-    const [{ data: properties }, { data: rawBookings }] = await Promise.all([
+    const [{ data: properties }, { data: rawBookings }, { data: rawBlocked }] = await Promise.all([
       supabase
         .from('properties')
         .select('id, name, nightly_rate, cleaning_fee')
@@ -34,6 +34,13 @@ export async function GET(request: NextRequest) {
         .lte('check_in', to)
         .gte('check_out', from)
         .order('check_in'),
+      supabase
+        .from('blocked_dates')
+        .select('id, property_id, start_date, end_date, reason, source_channel')
+        .eq('user_id', userId)
+        .lte('start_date', to)
+        .gte('end_date', from)
+        .order('start_date'),
     ]);
 
     const bookings = (rawBookings ?? []).map((b) => {
@@ -54,10 +61,28 @@ export async function GET(request: NextRequest) {
         guest_name: g?.name ?? 'Unknown',
         guest_phone: g?.phone ?? '',
         guest_email: g?.email ?? '',
+        source_channel: null,
       };
     });
 
-    return NextResponse.json({ bookings, properties: properties ?? [] });
+    const blockedBookings = (rawBlocked ?? []).map((d) => ({
+      id: d.id,
+      property_id: d.property_id,
+      check_in: d.start_date,
+      check_out: d.end_date,
+      nights: 0,
+      nightly_rate: 0,
+      total_amount: 0,
+      booking_source: d.source_channel ?? 'blocked',
+      status: 'blocked',
+      notes: d.reason ?? '',
+      guest_name: d.reason || 'Blocked',
+      guest_phone: '',
+      guest_email: '',
+      source_channel: d.source_channel,
+    }));
+
+    return NextResponse.json({ bookings: [...bookings, ...blockedBookings], properties: properties ?? [] });
   } catch (err) {
     console.error('[bookings/calendar]', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
