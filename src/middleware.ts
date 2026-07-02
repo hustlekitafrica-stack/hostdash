@@ -6,7 +6,7 @@ const AUTH_ROUTES = ['/auth/login', '/auth/register', '/auth/forgot-password'];
 const PROTECTED_PREFIXES = [
   '/dashboard', '/properties', '/booking-calendar', '/guests',
   '/expenses', '/reports', '/settings', '/alerts', '/unit-performance',
-  '/help', '/receipts',
+  '/help', '/receipts', '/admin',
 ];
 
 export async function middleware(request: NextRequest) {
