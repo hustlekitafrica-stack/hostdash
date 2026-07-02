@@ -21,8 +21,6 @@ export default function DashboardLayout({
 
   useEffect(() => {
     const checkAuth = async () => {
-      const demoToken = localStorage.getItem('auth_token');
-      if (demoToken) { setIsLoading(false); return; }
       try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -95,7 +93,7 @@ export default function DashboardLayout({
         <MobileNav />
 
         {/* Page content - Add top padding on mobile to account for header + action buttons */}
-        <main className={`flex-1 overflow-y-auto overflow-x-hidden lg:pt-0 pb-4 sm:pb-0 ${['/booking-calendar','/alerts','/guests','/unit-performance','/properties','/expenses','/reports','/settings','/help','/requests','/unit-types'].includes(pathname) ? 'pt-0' : 'pt-20'}`}>
+        <main className={`flex-1 overflow-y-auto overflow-x-hidden lg:pt-0 pb-4 sm:pb-0 ${['/booking-calendar','/alerts','/guests','/unit-performance','/properties','/expenses','/reports','/settings','/help','/unit-types'].includes(pathname) ? 'pt-0' : 'pt-20'}`}>
           <BrandProvider>
             {children}
           </BrandProvider>

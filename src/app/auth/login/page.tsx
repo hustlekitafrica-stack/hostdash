@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { createClient } from '@/lib/supabase/client';
+import { useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [step, setStep] = useState<'email' | 'password'>('email');
@@ -42,7 +44,8 @@ export default function LoginPage() {
         return;
       }
       toast.success('Login successful!');
-      router.push('/dashboard');
+      const next = searchParams.get('next') || '/dashboard';
+      router.push(next);
     } catch {
       toast.error('Network error. Please try again.');
     } finally {
@@ -139,15 +142,13 @@ export default function LoginPage() {
               />
             </div>
             <div className="text-right">
-              <button
-                type="button"
+              <Link
+                href="/auth/forgot-password"
                 className="text-sm font-medium transition-colors"
                 style={{ color: '#16a34a' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#15803d')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#16a34a')}
               >
                 Forgot password?
-              </button>
+              </Link>
             </div>
             <button
               type="submit"
