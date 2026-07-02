@@ -38,7 +38,6 @@ export default function DashboardPage() {
   const [trends, setTrends] = useState<any>(null);
   const [trendsLoading, setTrendsLoading] = useState(true);
   const [alertsSummary, setAlertsSummary] = useState<{ checkIns: number; checkOuts: number; unpaid: number; upcoming: number } | null>(null);
-  const [pendingRequests, setPendingRequests] = useState(0);
   const [activeSeries, setActiveSeries] = useState({ revenue: true, expenses: true, profit: true, occupancy: false });
   const [hoveredMonth, setHoveredMonth] = useState<number | null>(null);
 
@@ -80,14 +79,6 @@ export default function DashboardPage() {
   }, [getDateRange]);
 
   useEffect(() => {
-    fetch('/api/requests')
-      .then(r => r.json())
-      .then(d => {
-        const pending = (d.requests ?? []).filter((r: any) => r.status === 'pending').length;
-        setPendingRequests(pending);
-      })
-      .catch(() => {});
-
     fetch('/api/alerts')
       .then(r => r.json())
       .then(d => {
@@ -722,19 +713,9 @@ export default function DashboardPage() {
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
             </a>
           </div>
-          {pendingRequests > 0 && (
-            <a href="/requests" className="flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-3 hover:bg-amber-100 transition-colors">
-              <span className="w-7 h-7 rounded-full bg-amber-500 text-white text-xs font-black flex items-center justify-center flex-shrink-0">{pendingRequests}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-amber-800">Pending Booking Request{pendingRequests !== 1 ? 's' : ''}</p>
-                <p className="text-xs text-amber-700">Tap to review and accept or decline</p>
-              </div>
-              <svg className="w-4 h-4 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-            </a>
-          )}
           {alertsSummary === null ? (
             <p className="text-sm text-gray-400">Loading…</p>
-          ) : (alertsSummary.checkIns + alertsSummary.checkOuts + alertsSummary.unpaid + alertsSummary.upcoming) === 0 && pendingRequests === 0 ? (
+          ) : (alertsSummary.checkIns + alertsSummary.checkOuts + alertsSummary.unpaid + alertsSummary.upcoming) === 0 ? (
             <div className="flex items-center gap-2 text-sm text-green-600">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               No urgent alerts right now.

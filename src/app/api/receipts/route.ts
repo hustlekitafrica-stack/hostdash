@@ -42,7 +42,6 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const {
-      booking_request_id = null,
       guest_name,
       guest_phone,
       guest_email = '',
@@ -82,7 +81,7 @@ export async function POST(req: NextRequest) {
       .from('receipts')
       .insert({
         host_user_id:       hostId,
-        booking_request_id: booking_request_id ?? null,
+        booking_request_id: null,
         guest_name:         guest_name.trim(),
         guest_phone:        guest_phone.trim(),
         guest_email:        guest_email.trim(),
