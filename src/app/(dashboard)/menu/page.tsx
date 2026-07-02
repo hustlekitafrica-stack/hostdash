@@ -145,7 +145,7 @@ export default function MenuPage() {
       const { error: upErr } = await supabase.storage.from('property-photos').upload(path, file, { upsert: true });
       if (upErr) { alert(`Upload failed: ${upErr.message}`); return; }
       const { data: { publicUrl } } = supabase.storage.from('property-photos').getPublicUrl(path);
-      const res = await fetch(`/api/stay/menu/${item.id}`, {
+      const res = await fetch(`/api/menu/${item.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image_url: publicUrl }),
@@ -162,7 +162,7 @@ export default function MenuPage() {
 
   const load = () => {
     setLoading(true);
-    fetch('/api/stay/menu')
+    fetch('/api/menu')
       .then(r => r.json())
       .then(d => setItems(d.items ?? []))
       .finally(() => setLoading(false));
@@ -198,7 +198,7 @@ export default function MenuPage() {
     if (!form.name.trim()) { setError('Item name is required.'); return; }
     setSaving(true); setError('');
     try {
-      const url    = editing ? `/api/stay/menu/${editing.id}` : '/api/stay/menu';
+      const url    = editing ? `/api/menu/${editing.id}` : '/api/menu';
       const method = editing ? 'PATCH' : 'POST';
       const res    = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
       const data   = await res.json();
@@ -213,13 +213,13 @@ export default function MenuPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this menu item?')) return;
     setDeleting(id);
-    await fetch(`/api/stay/menu/${id}`, { method: 'DELETE' });
+    await fetch(`/api/menu/${id}`, { method: 'DELETE' });
     setItems(prev => prev.filter(i => i.id !== id));
     setDeleting(null);
   };
 
   const handleToggleActive = async (item: MenuItem) => {
-    const res  = await fetch(`/api/stay/menu/${item.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ active: !item.active }) });
+    const res  = await fetch(`/api/menu/${item.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ active: !item.active }) });
     const data = await res.json();
     if (res.ok) setItems(prev => prev.map(i => i.id === item.id ? data.item : i));
   };

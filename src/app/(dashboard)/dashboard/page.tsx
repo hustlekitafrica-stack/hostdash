@@ -80,7 +80,7 @@ export default function DashboardPage() {
   }, [getDateRange]);
 
   useEffect(() => {
-    fetch('/api/stay/requests')
+    fetch('/api/requests')
       .then(r => r.json())
       .then(d => {
         const pending = (d.requests ?? []).filter((r: any) => r.status === 'pending').length;

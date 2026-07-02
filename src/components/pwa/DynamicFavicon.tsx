@@ -18,7 +18,7 @@ export function DynamicFavicon() {
     const stored = localStorage.getItem('brand_favicon');
     if (stored) applyFavicon(stored);
 
-    fetch('/api/stay/brand')
+    fetch('/api/settings/brand')
       .then(r => r.ok ? r.json() : null)
       .then(d => {
         if (d?.favicon_url) {

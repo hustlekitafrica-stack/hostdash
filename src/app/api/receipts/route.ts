@@ -108,11 +108,9 @@ export async function POST(req: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     if (!data)  return NextResponse.json({ error: 'Receipt could not be created' }, { status: 500 });
 
-    const baseUrl    = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-    const receiptUrl = `${baseUrl}/stay/receipt/${data.receipt_token}`;
     const firstName  = guest_name.trim().split(' ')[0];
     const waText     = encodeURIComponent(
-      `Hi ${firstName}! 🧾 Here is your payment receipt from Kogelo Suites.\n\nReceipt No: ${data.receipt_number}\nAmount Paid: KSh ${paid.toLocaleString()}\n\nView & download your receipt here:\n${receiptUrl}\n\nThank you for staying with us! – Kogelo Suites`
+      `Hi ${firstName}! 🧾 Here is your payment receipt from Kogelo Suites.\n\nReceipt No: ${data.receipt_number}\nAmount Paid: KSh ${paid.toLocaleString()}\n\nThank you for staying with us! – Kogelo Suites`
     );
     const whatsappLink = `https://wa.me/${guest_phone.trim().replace(/\D/g, '')}?text=${waText}`;
 
@@ -121,7 +119,6 @@ export async function POST(req: NextRequest) {
       id:             data.id,
       receipt_number: data.receipt_number,
       receipt_token:  data.receipt_token,
-      receipt_url:    receiptUrl,
       whatsapp_link:  whatsappLink,
     });
   } catch (err) {

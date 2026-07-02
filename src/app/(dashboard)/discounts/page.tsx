@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, Save, X, Tag, Calendar, BedDouble, Percent, DollarSign, ChevronDown, ChevronUp } from 'lucide-react';
-import { DatePickerModal } from '@/components/stay/SearchWidget';
+import { DatePickerModal } from '@/components/ui/DatePickerModal';
 import toast from 'react-hot-toast';
 
 type DiscountType = 'first_timer' | 'early_booking' | 'online_booking' | 'manual';
@@ -93,7 +93,7 @@ export default function DiscountsPage() {
 
   useEffect(() => {
     load();
-    fetch('/api/stay/properties')
+    fetch('/api/properties')
       .then(r => r.json())
       .then(d => setProperties((d.properties ?? []).map((p: Property) => ({ id: p.id, name: p.name }))));
   }, []);

@@ -15,7 +15,6 @@ type TaxLine = { label: string; rate: string };
 
 type ReceiptResult = {
   receipt_number: string;
-  receipt_url: string;
   whatsapp_link: string;
 };
 
@@ -61,7 +60,7 @@ export default function RequestsPage() {
 
   const load = () => {
     setLoading(true);
-    fetch('/api/stay/requests')
+    fetch('/api/requests')
       .then(r => r.json())
       .then(d => setRequests(d.requests ?? []))
       .finally(() => setLoading(false));
@@ -130,7 +129,6 @@ export default function RequestsPage() {
       if (data.error) { showToast(`Error: ${data.error}`); return; }
       setReceiptResult({
         receipt_number: data.receipt_number,
-        receipt_url:    data.receipt_url,
         whatsapp_link:  data.whatsapp_link,
       });
       showToast(`✓ Receipt ${data.receipt_number} created`);
@@ -142,7 +140,7 @@ export default function RequestsPage() {
 
   const updateStatus = async (id: string, status: string, extraPayload?: Record<string, string>) => {
     setUpdating(id);
-    const res  = await fetch(`/api/stay/booking/${id}`, {
+    const res  = await fetch(`/api/requests/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status, ...extraPayload }),
@@ -180,7 +178,7 @@ export default function RequestsPage() {
   const sendPaymentLink = async (req: BookingRequest) => {
     setSendingPayment(req.id);
     try {
-      const res  = await fetch('/api/stay/pesapal/order', {        
+      const res  = await fetch('/api/pesapal/order', {        
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
@@ -194,7 +192,7 @@ export default function RequestsPage() {
       const data = await res.json();
       if (data.redirect_url) {
         // Also SMS the link to the guest via the booking PATCH endpoint
-        await fetch(`/api/stay/booking/${req.id}`, {
+        await fetch(`/api/requests/${req.id}`, {
           method:  'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ status: 'confirmed', payment_link: data.redirect_url }),
@@ -213,7 +211,7 @@ export default function RequestsPage() {
     setSendingWa(req.id);
     try {
       const rooms = Array.isArray(req.room_details) ? req.room_details : [];
-      const res  = await fetch('/api/stay/reviews', {
+      const res  = await fetch('/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -425,15 +423,6 @@ export default function RequestsPage() {
                   <p className="font-black text-green-800 text-sm">{receiptResult.receipt_number}</p>
                   <p className="text-xs text-green-600 mt-0.5">Receipt created successfully</p>
                 </div>
-                <a
-                  href={receiptResult.receipt_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white bg-gray-900 hover:bg-gray-700 transition-colors"
-                >
-                  <Receipt className="w-4 h-4" />
-                  🖨️ Print Receipt
-                </a>
                 <a
                   href={receiptResult.whatsapp_link}
                   target="_blank"
