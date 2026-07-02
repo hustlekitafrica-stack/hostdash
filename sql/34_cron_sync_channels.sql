@@ -8,14 +8,14 @@
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 
 -- ============================================================================
--- 2. Schedule the sync job every 4 hours
+-- 2. Schedule the sync job every 20 minutes
 -- ============================================================================
 -- Replace the URL with your deployed API root.
 -- The endpoint must be called with the CRON_SECRET in the Authorization header.
 -- If you need to sync every user, the endpoint loops through all active channels.
 SELECT cron.schedule(
   'sync-channels',
-  '0 */4 * * *',
+  '*/20 * * * *',
   $$
     SELECT net.http_post(
       url := 'https://hostdashapp.vercel.app/api/jobs/sync-channels',

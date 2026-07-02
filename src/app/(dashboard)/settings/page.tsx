@@ -4,9 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { createClient } from '@/lib/supabase/client';
 
-type Tab = 'general' | 'brand' | 'categories' | 'sms' | 'tax' | 'account';
+type Tab = 'general' | 'brand' | 'categories' | 'tax' | 'account';
 type TaxLine = { label: string; rate: string };
-type SmsTemplate = { key: string; label: string; body: string; variables: string[] };
 
 const COLOR_PRESETS = [
   { primary: '#1e293b', secondary: '#16a34a' },
@@ -65,11 +64,6 @@ export default function SettingsPage() {
   const [newCategory, setNewCategory] = useState('');
   const [catLoading, setCatLoading] = useState(false);
 
-  // SMS Templates tab state
-  const [smsTemplates, setSmsTemplates] = useState<SmsTemplate[]>([]);
-  const [smsDraft,     setSmsDraft]     = useState<Record<string, string>>({});
-  const [smsSaving,    setSmsSaving]    = useState<string | null>(null);
-
   // Profile photo state
   const [avatarUrl, setAvatarUrl] = useState('');
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -97,36 +91,7 @@ export default function SettingsPage() {
       .then(r => r.json())
       .then(d => { if (d.categories) setCategories(d.categories); })
       .catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    fetch('/api/sms-templates')
-      .then(r => r.json())
-      .then(d => {
-        if (d.templates) {
-          setSmsTemplates(d.templates);
-          const drafts: Record<string, string> = {};
-          d.templates.forEach((t: SmsTemplate) => { drafts[t.key] = t.body; });
-          setSmsDraft(drafts);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  const handleSaveSmsTemplate = async (key: string) => {
-    setSmsSaving(key);
-    try {
-      const res = await fetch('/api/sms-templates', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key, body: smsDraft[key] }),
-      });
-      const data = await res.json();
-      if (data.error) { toast.error(data.error); return; }
-      toast.success('Template saved');
-    } catch { toast.error('Network error'); }
-    finally { setSmsSaving(null); }
-  };  
+  }, []);  
 
   useEffect(() => {
     const h = (e: CustomEvent) => setSidebarCollapsed(e.detail.collapsed);
@@ -325,7 +290,6 @@ export default function SettingsPage() {
     { id: 'general', label: 'General' },
     { id: 'brand', label: 'Brand' },
     { id: 'categories', label: 'Expenses' },
-    { id: 'sms', label: 'SMS Templates' },
     { id: 'tax', label: 'Tax & KRA' },
     { id: 'account', label: 'Account' },
   ];
@@ -679,35 +643,6 @@ export default function SettingsPage() {
                 ))}
               </ul>
             )}
-          </div>
-        )}
-
-        {/* ── SMS TEMPLATES TAB ── */}
-        {activeTab === 'sms' && (
-          <div className="space-y-5 max-w-3xl">
-            {smsTemplates.map(t => (
-                <div key={t.key} className="bg-white border border-gray-200 rounded-xl p-5">
-                  <h3 className="text-sm font-bold text-gray-900 mb-0.5">{t.label}</h3>
-                  <p className="text-xs text-gray-400 mb-2">
-                    Variables: {t.variables.map(v => <code key={v} className="bg-gray-100 px-1 rounded mr-1">{`{{${v}}}`}</code>)}
-                  </p>
-                  <textarea
-                    rows={4}
-                    value={smsDraft[t.key] ?? t.body}
-                    onChange={e => setSmsDraft(prev => ({ ...prev, [t.key]: e.target.value }))}
-                    className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-green-500 resize-none mb-3"
-                  />
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-400">{(smsDraft[t.key] ?? t.body).length} chars</span>
-                    <button
-                      onClick={() => handleSaveSmsTemplate(t.key)}
-                      disabled={smsSaving === t.key}
-                      className="px-4 py-1.5 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-60">
-                      {smsSaving === t.key ? 'Saving…' : 'Save'}
-                    </button>
-                  </div>
-                </div>
-            ))}
           </div>
         )}
 
