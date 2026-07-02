@@ -28,47 +28,54 @@
 CREATE OR REPLACE FUNCTION seed_user_defaults()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Insert default income categories
-  INSERT INTO income_categories (user_id, name, is_default, icon, color, sort_order)
-  VALUES
-    (NEW.id, 'Short Stay Rental', true, '🏠', '#0f766e', 1),
-    (NEW.id, 'Long Stay Rental', true, '📅', '#0f766e', 2),
-    (NEW.id, 'Security Deposit Kept', true, '🔒', '#d97706', 3),
-    (NEW.id, 'Cleaning Fee', true, '🧹', '#0f766e', 4),
-    (NEW.id, 'Early Check-in Fee', true, '⏰', '#0f766e', 5),
-    (NEW.id, 'Late Check-out Fee', true, '⏰', '#0f766e', 6),
-    (NEW.id, 'Extra Guest Fee', true, '👥', '#0f766e', 7),
-    (NEW.id, 'Airport Pickup', true, '🚗', '#0f766e', 8),
-    (NEW.id, 'Laundry Services', true, '🧺', '#0f766e', 9),
-    (NEW.id, 'Other Services', true, '⭐', '#0f766e', 10);
+  -- Insert default income categories (non-fatal)
+  BEGIN
+    INSERT INTO income_categories (user_id, name, is_default, icon, color, sort_order)
+    VALUES
+      (NEW.id, 'Short Stay Rental', true, '🏠', '#0f766e', 1),
+      (NEW.id, 'Long Stay Rental', true, '📅', '#0f766e', 2),
+      (NEW.id, 'Security Deposit Kept', true, '🔒', '#d97706', 3),
+      (NEW.id, 'Cleaning Fee', true, '🧹', '#0f766e', 4),
+      (NEW.id, 'Early Check-in Fee', true, '⏰', '#0f766e', 5),
+      (NEW.id, 'Late Check-out Fee', true, '⏰', '#0f766e', 6),
+      (NEW.id, 'Extra Guest Fee', true, '👥', '#0f766e', 7),
+      (NEW.id, 'Airport Pickup', true, '🚗', '#0f766e', 8),
+      (NEW.id, 'Laundry Services', true, '🧺', '#0f766e', 9),
+      (NEW.id, 'Other Services', true, '⭐', '#0f766e', 10);
+  EXCEPTION WHEN OTHERS THEN NULL;
+  END;
 
-  -- Insert default expense categories
-  INSERT INTO expense_categories (user_id, name, is_default, icon, color, sort_order)
-  VALUES
-    (NEW.id, 'Caretaker/Housekeeper Salary', true, '👤', '#ef4444', 1),
-    (NEW.id, 'Cleaning Supplies', true, '🧹', '#ef4444', 2),
-    (NEW.id, 'Internet/WiFi Bill', true, '📡', '#ef4444', 3),
-    (NEW.id, 'Electricity Bill', true, '⚡', '#ef4444', 4),
-    (NEW.id, 'Water Bill', true, '💧', '#ef4444', 5),
-    (NEW.id, 'DSTV/Netflix Subscription', true, '📺', '#ef4444', 6),
-    (NEW.id, 'Property Maintenance & Repairs', true, '🔧', '#ef4444', 7),
-    (NEW.id, 'Airbnb/Booking.com Commission', true, '💳', '#ef4444', 8),
-    (NEW.id, 'Furnishings & Appliances', true, '🛋️', '#ef4444', 9),
-    (NEW.id, 'Toiletries & Consumables', true, '🧴', '#ef4444', 10),
-    (NEW.id, 'Security/Guard Services', true, '🔐', '#ef4444', 11),
-    (NEW.id, 'Property Insurance', true, '🛡️', '#ef4444', 12),
-    (NEW.id, 'Service Charge/Strata Fee', true, '🏢', '#ef4444', 13),
-    (NEW.id, 'Laundry', true, '🧺', '#ef4444', 14),
-    (NEW.id, 'Refunds to Guests', true, '↩️', '#ef4444', 15),
-    (NEW.id, 'Marketing & Photography', true, '📸', '#ef4444', 16),
-    (NEW.id, 'Accountant/Legal Fees', true, '⚖️', '#ef4444', 17),
-    (NEW.id, 'Other', true, '⭐', '#ef4444', 18);
+  -- Insert default expense categories (non-fatal)
+  BEGIN
+    INSERT INTO expense_categories (user_id, name, is_default, icon, color, sort_order)
+    VALUES
+      (NEW.id, 'Caretaker/Housekeeper Salary', true, '👤', '#ef4444', 1),
+      (NEW.id, 'Cleaning Supplies', true, '🧹', '#ef4444', 2),
+      (NEW.id, 'Internet/WiFi Bill', true, '📡', '#ef4444', 3),
+      (NEW.id, 'Electricity Bill', true, '⚡', '#ef4444', 4),
+      (NEW.id, 'Water Bill', true, '💧', '#ef4444', 5),
+      (NEW.id, 'DSTV/Netflix Subscription', true, '📺', '#ef4444', 6),
+      (NEW.id, 'Property Maintenance & Repairs', true, '🔧', '#ef4444', 7),
+      (NEW.id, 'Airbnb/Booking.com Commission', true, '💳', '#ef4444', 8),
+      (NEW.id, 'Furnishings & Appliances', true, '🛋️', '#ef4444', 9),
+      (NEW.id, 'Toiletries & Consumables', true, '🧴', '#ef4444', 10),
+      (NEW.id, 'Security/Guard Services', true, '🔐', '#ef4444', 11),
+      (NEW.id, 'Property Insurance', true, '🛡️', '#ef4444', 12),
+      (NEW.id, 'Service Charge/Strata Fee', true, '🏢', '#ef4444', 13),
+      (NEW.id, 'Laundry', true, '🧺', '#ef4444', 14),
+      (NEW.id, 'Refunds to Guests', true, '↩️', '#ef4444', 15),
+      (NEW.id, 'Marketing & Photography', true, '📸', '#ef4444', 16),
+      (NEW.id, 'Accountant/Legal Fees', true, '⚖️', '#ef4444', 17),
+      (NEW.id, 'Other', true, '⭐', '#ef4444', 18);
+  EXCEPTION WHEN OTHERS THEN NULL;
+  END;
 
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger to run seed function when user signs up
+-- Trigger to run seed function when user signs up (idempotent)
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION seed_user_defaults();
