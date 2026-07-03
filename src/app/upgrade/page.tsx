@@ -161,7 +161,7 @@ export default function UpgradePage() {
               <div
                 key={p}
                 onClick={() => setPlan(p)}
-                className={`relative rounded-2xl p-4 border-2 cursor-pointer transition-all duration-200 ${
+                className={`relative rounded-2xl px-4 py-2.5 border-2 cursor-pointer transition-all duration-200 ${
                   sel ? 'border-teal-500 bg-slate-800' : 'border-slate-700/60 bg-slate-800/30'
                 }`}
               >
@@ -179,13 +179,13 @@ export default function UpgradePage() {
                 {isStarter && p === 'pro' ? (
                   <>
                     <p className="text-slate-500 text-[11px] line-through">${c.price}</p>
-                    <p className="text-white text-[2rem] font-extrabold leading-tight">$25</p>
+                    <p className="text-white text-2xl font-extrabold leading-tight">$25</p>
                     {formatLocal(25) && <p className="text-teal-400 text-[11px] font-semibold">{formatLocal(25)}</p>}
                     <p className="text-teal-400 text-[11px] font-semibold">You paid $45 ✓</p>
                   </>
                 ) : (
                   <>
-                    <p className="text-white text-[2rem] font-extrabold leading-tight">${c.price}</p>
+                    <p className="text-white text-2xl font-extrabold leading-tight">${c.price}</p>
                     {formatLocal(c.price) && (
                       <p className="text-slate-500 text-[11px]">{formatLocal(c.price)}</p>
                     )}
@@ -266,30 +266,6 @@ export default function UpgradePage() {
             )}
           </button>
 
-          <div className="flex gap-2 justify-center flex-wrap mt-4">
-            {['VISA', 'MC', 'M-PESA', 'AIRTEL'].map(m => (
-              <span key={m} className="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300">
-                {m}
-              </span>
-            ))}
-          </div>
-
-          <p className="text-slate-600 text-[11px] text-center mt-3">
-            Secured by PesaPal · 256-bit SSL · No recurring fees
-          </p>
-
-          <div className="flex items-center justify-center gap-4 mt-3">
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="text-slate-600 text-xs hover:text-slate-400 transition-colors"
-            >
-              Back to dashboard
-            </button>
-            <span className="text-slate-700">·</span>
-            <a href="mailto:support@hostdash.app" className="text-slate-600 text-xs hover:text-slate-400 transition-colors">
-              Contact support
-            </a>
-          </div>
         </div>
 
       </main>
