@@ -9,9 +9,11 @@ interface SubStatus {
   days_left: number | null;
 }
 
+const DEFAULT_STATUS: SubStatus = { is_paid: false, is_expired: false, days_left: 14 };
+
 export function TrialBanner() {
   const router = useRouter();
-  const [status, setStatus] = useState<SubStatus | null>(null);
+  const [status, setStatus] = useState<SubStatus>(DEFAULT_STATUS);
 
   useEffect(() => {
     fetch('/api/subscription')
@@ -20,7 +22,7 @@ export function TrialBanner() {
       .catch(() => {});
   }, []);
 
-  if (!status || status.is_paid) return null;
+  if (status.is_paid) return null;
 
   const isExpired = status.is_expired;
   const daysLeft  = status.days_left ?? 0;

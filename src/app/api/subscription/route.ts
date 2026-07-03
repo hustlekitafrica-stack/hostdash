@@ -7,23 +7,34 @@ function calcDaysLeft(trialStart: string | null): number {
   return Math.max(0, Math.ceil(14 - elapsed));
 }
 
+const TRIAL_DEFAULTS = {
+  trial_start: null,
+  subscription_status: 'trial',
+  subscription_plan: null,
+  whatsapp_phone: null,
+  days_left: 14,
+  is_expired: false,
+  is_paid: false,
+};
+
 export async function GET() {
   try {
     const supabase = await createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session?.user) {
+    if (!user) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const { data: profile, error } = await supabase
       .from('profiles')
       .select('trial_start, subscription_status, subscription_plan, whatsapp_phone')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.warn('[subscription/GET] profile query error — returning trial defaults:', error.message);
+      return NextResponse.json(TRIAL_DEFAULTS);
     }
 
     const daysLeft = calcDaysLeft(profile?.trial_start ?? null);
@@ -40,7 +51,7 @@ export async function GET() {
     });
   } catch (err) {
     console.error('[subscription/GET]', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(TRIAL_DEFAULTS);
   }
 }
 
