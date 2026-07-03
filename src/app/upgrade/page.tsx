@@ -132,7 +132,7 @@ export default function UpgradePage() {
         )}
 
         {/* Tab switcher */}
-        <div className="flex bg-slate-800/80 rounded-xl p-1 mt-1 mb-2">
+        <div className="flex bg-slate-800/80 rounded-xl p-1 mt-1 mb-4">
           {(['starter', 'pro'] as Plan[]).map(p => (
             <button
               key={p}
@@ -153,7 +153,7 @@ export default function UpgradePage() {
         </div>
 
         {/* Pricing cards */}
-        <div className="grid grid-cols-2 gap-3 mb-2">
+        <div className="grid grid-cols-2 gap-3 mb-4">
           {(['starter', 'pro'] as Plan[]).map(p => {
             const c   = PLAN_CONFIG[p];
             const sel = plan === p;
@@ -229,7 +229,7 @@ export default function UpgradePage() {
         </div>
 
         {/* CTA section */}
-        <div className="mt-auto">
+        <div className="mt-4">
           {isStarter ? (
             <p className="text-slate-400 text-sm text-center mb-3">
               Pay the <span className="text-white font-semibold">$25 difference</span> to unlock all Pro features
