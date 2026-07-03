@@ -197,7 +197,7 @@ export default function UpgradePage() {
         </div>
 
         {/* Feature list for selected plan */}
-        <div className="mb-4 rounded-2xl bg-slate-800/30 border border-slate-800 overflow-hidden">
+        <div className="mb-2 rounded-2xl bg-slate-800/30 border border-slate-800 overflow-hidden">
           <div className="px-4 py-2 border-b border-slate-800 bg-slate-800/60">
             <span className="text-teal-400 text-xs font-bold">
               {plan === 'pro' ? 'Pro' : 'Starter'} includes
