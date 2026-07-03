@@ -58,13 +58,13 @@ export function Sidebar({ isOpen = true, onClose, isMobile = false }: SidebarPro
   return (
     <div
       className={`
-        fixed left-0 top-0 h-screen
+        fixed left-0 top-0
         border-r border-slate-800 flex flex-col shadow-2xl rounded-r-2xl
         transition-all duration-300 ease-in-out z-40
         ${isMobile ? (isOpen ? 'translate-x-0' : '-translate-x-full') : ''}
         ${collapsed ? 'w-20' : 'w-64'}
       `}
-      style={{ background: 'linear-gradient(to bottom, var(--brand-primary, #1e293b), var(--brand-primary-dark, #0f172a))' }}
+      style={{ height: '100dvh', background: 'linear-gradient(to bottom, var(--brand-primary, #1e293b), var(--brand-primary-dark, #0f172a))' }}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-6 border-b border-slate-800">
@@ -371,7 +371,7 @@ export function Sidebar({ isOpen = true, onClose, isMobile = false }: SidebarPro
       </div>
 
       {/* Upgrade / Trial Section */}
-      <div className="py-3 border-t border-slate-800">
+      <div className="py-3 border-t border-slate-800 flex-shrink-0">
         <SidebarUpgradeWidget collapsed={collapsed} />
       </div>
     </div>
