@@ -196,33 +196,34 @@ export default function UpgradePage() {
           })}
         </div>
 
-        {/* Feature comparison table */}
+        {/* Feature list for selected plan */}
         <div className="mb-6 rounded-2xl bg-slate-800/30 border border-slate-800 overflow-hidden">
-          <div className="flex items-center justify-end gap-0 px-4 py-2.5 border-b border-slate-800 bg-slate-800/60">
-            <span className="text-slate-400 text-xs font-semibold flex-1">Feature</span>
-            <span className={`text-xs font-bold w-14 text-center ${
-              plan === 'starter' ? 'text-teal-400' : 'text-slate-500'
-            }`}>Starter</span>
-            <span className={`text-xs font-bold w-12 text-center ${
-              plan === 'pro' ? 'text-teal-400' : 'text-slate-500'
-            }`}>Pro</span>
+          <div className="px-4 py-2.5 border-b border-slate-800 bg-slate-800/60">
+            <span className="text-teal-400 text-xs font-bold">
+              {plan === 'pro' ? 'Pro' : 'Starter'} includes
+            </span>
           </div>
 
-          {FEATURES.map((f, i) => (
+          {plan === 'pro' && (
+            <div className="flex items-center px-4 py-2.5 gap-2.5 border-b border-slate-800/60">
+              <span className="text-teal-400 font-bold text-sm flex-shrink-0">✓</span>
+              <span className="flex-1 text-xs text-slate-400">All Starter features</span>
+            </div>
+          )}
+          {FEATURES.filter(f => plan === 'pro' ? f.star : f.starter).map((f, i, arr) => (
             <div
               key={f.label}
-              className={`flex items-center px-4 py-2.5 gap-2 ${
-                i < FEATURES.length - 1 ? 'border-b border-slate-800/60' : ''
-              } ${f.star ? 'bg-teal-950/20' : ''}`}
+              className={`flex items-center px-4 py-2.5 gap-2.5 ${
+                i < arr.length - 1 ? 'border-b border-slate-800/60' : ''
+              } ${f.star && plan === 'pro' ? 'bg-teal-950/20' : ''}`}
             >
-              {f.star
-                ? <span className="text-teal-500 text-[10px] flex-shrink-0">★</span>
-                : <span className="w-[10px] flex-shrink-0" />}
+              <span className="text-teal-400 font-bold text-sm flex-shrink-0">✓</span>
               <span className={`flex-1 text-xs ${
-                f.star ? 'text-slate-200 font-medium' : 'text-slate-400'
-              }`}>{f.label}</span>
-              <span className="w-14 flex justify-center"><Check on={f.starter} /></span>
-              <span className="w-12 flex justify-center"><Check on={f.pro} /></span>
+                f.star && plan === 'pro' ? 'text-slate-200 font-medium' : 'text-slate-400'
+              }`}>
+                {f.label}
+                {f.star && plan === 'pro' && <span className="text-teal-500 ml-1 text-[10px]">★</span>}
+              </span>
             </div>
           ))}
         </div>
