@@ -40,6 +40,8 @@ export default function UpgradePage() {
   const [loading, setLoading]         = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [isStarter, setIsStarter]     = useState(false);
+  const [isExpired, setIsExpired]     = useState(false);
+  const [daysLeft, setDaysLeft]       = useState<number | null>(null);
   const { formatLocal }                = useCurrency();
 
   useEffect(() => {
@@ -50,10 +52,18 @@ export default function UpgradePage() {
     });
     fetch('/api/subscription')
       .then(r => r.ok ? r.json() : null)
-      .then((d: { subscription_status?: string; subscription_plan?: string } | null) => {
-        if (d?.subscription_status === 'paid' && d?.subscription_plan === 'starter') {
-          setIsStarter(true);
+      .then((d: { subscription_status?: string; subscription_plan?: string; is_expired?: boolean; days_left?: number | null } | null) => {
+        if (d?.subscription_status === 'paid') {
+          if (d?.subscription_plan === 'pro') {
+            router.push('/dashboard');
+            return;
+          }
+          if (d?.subscription_plan === 'starter') {
+            setIsStarter(true);
+          }
         }
+        if (d?.is_expired) setIsExpired(true);
+        if (d?.days_left !== undefined) setDaysLeft(d.days_left);
       })
       .catch(() => {});
   }, [router]);
@@ -223,9 +233,14 @@ export default function UpgradePage() {
             <p className="text-slate-400 text-sm text-center mb-3">
               Pay the <span className="text-white font-semibold">$25 difference</span> to unlock all Pro features
             </p>
+          ) : isExpired ? (
+            <p className="text-slate-400 text-sm text-center mb-3">
+              Your trial has ended. Upgrade to continue using HostDash —{' '}
+              <span className="text-white font-semibold">${displayPrice} one-time</span>
+            </p>
           ) : (
             <p className="text-slate-400 text-sm text-center mb-3">
-              14-day free trial, then{' '}
+              {daysLeft !== null ? `${daysLeft} days left in trial` : '14-day free trial'}, then{' '}
               <span className="text-white font-semibold">${displayPrice} one-time</span>
             </p>
           )}

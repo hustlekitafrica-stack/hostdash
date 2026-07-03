@@ -14,7 +14,7 @@ export async function GET() {
 
     const { data: profile } = await publicSupabase
       .from('profiles')
-      .select('subscription_status, pesapal_order_id')
+      .select('subscription_status, subscription_plan, pesapal_order_id')
       .eq('id', session.user.id)
       .single();
 
@@ -31,10 +31,26 @@ export async function GET() {
     const isPaid   = txStatus.payment_status_description === PESAPAL_PAID_STATUS;
 
     if (isPaid) {
+      const { data: payment } = await publicSupabase
+        .from('platform_payments')
+        .select('amount_usd')
+        .eq('pesapal_order_id', orderTrackingId)
+        .single();
+
+      const amount = payment?.amount_usd ?? 0;
+      let plan: string;
+      if (amount >= 70) {
+        plan = 'pro';
+      } else if (amount >= 25 && profile?.subscription_plan === 'starter') {
+        plan = 'pro'; // Upgrade from Starter
+      } else {
+        plan = 'starter';
+      }
+
       await Promise.all([
         publicSupabase
           .from('profiles')
-          .update({ subscription_status: 'paid', subscription_plan: 'lifetime' })
+          .update({ subscription_status: 'paid', subscription_plan: plan })
           .eq('id', session.user.id),
 
         publicSupabase

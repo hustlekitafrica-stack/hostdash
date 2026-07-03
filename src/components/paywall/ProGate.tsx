@@ -26,7 +26,7 @@ export function ProGate({ feature, children }: ProGateProps) {
   if (isPro) return <>{children}</>;
 
   return (
-    <div className="relative min-h-[400px] flex flex-col">
+    <div className="relative min-h-[400px] max-h-[calc(100vh-4rem)] overflow-hidden flex flex-col">
       {/* Blurred background preview */}
       <div className="pointer-events-none select-none" aria-hidden>
         <div className="blur-sm opacity-40 saturate-50">

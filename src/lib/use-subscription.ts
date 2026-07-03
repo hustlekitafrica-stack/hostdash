@@ -39,7 +39,7 @@ export function useSubscription(): SubscriptionState {
         const isPaid = d.is_paid;
         const plan   = d.subscription_plan ?? '';
 
-        const isPro     = isPaid && (plan === 'pro' || plan === 'lifetime');
+        const isPro     = isPaid && plan === 'pro';
         const isStarter = isPaid && plan === 'starter';
         const isTrial   = !isPaid && !d.is_expired;
         const isExpired = !isPaid && d.is_expired;
