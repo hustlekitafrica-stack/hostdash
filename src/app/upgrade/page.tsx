@@ -38,6 +38,7 @@ export default function UpgradePage() {
   const [plan, setPlan]               = useState<Plan>('pro');
   const [loading, setLoading]         = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isStarter, setIsStarter]     = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -45,7 +46,18 @@ export default function UpgradePage() {
       if (!data.user) { router.push('/auth/login?next=/upgrade'); return; }
       setCheckingAuth(false);
     });
+    fetch('/api/subscription')
+      .then(r => r.ok ? r.json() : null)
+      .then((d: { subscription_status?: string; subscription_plan?: string } | null) => {
+        if (d?.subscription_status === 'paid' && d?.subscription_plan === 'starter') {
+          setIsStarter(true);
+        }
+      })
+      .catch(() => {});
   }, [router]);
+
+  const activePlan = isStarter ? 'pro-upgrade' : plan;
+  const displayPrice = isStarter ? 25 : PLAN_CONFIG[plan].price;
 
   const handlePay = async () => {
     setLoading(true);
@@ -53,7 +65,7 @@ export default function UpgradePage() {
       const res  = await fetch('/api/pesapal/order', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ plan }),
+        body:    JSON.stringify({ plan: activePlan }),
       });
       const json = await res.json() as { redirect_url?: string; error?: string };
       if (!res.ok || json.error) {
@@ -98,19 +110,32 @@ export default function UpgradePage() {
 
       <main className="flex-1 flex flex-col max-w-sm mx-auto w-full px-4 pb-8">
 
+        {/* Starter upgrade banner */}
+        {isStarter && (
+          <div className="mt-4 mb-3 px-4 py-3 rounded-xl bg-teal-500/10 border border-teal-500/30 text-center">
+            <p className="text-teal-300 text-xs font-semibold">
+              ★ You\'re on Starter — upgrade to Pro for just <span className="text-white font-bold">$25 more</span>
+            </p>
+          </div>
+        )}
+
         {/* Tab switcher */}
-        <div className="flex bg-slate-800/80 rounded-xl p-1 mt-4 mb-5">
+        <div className="flex bg-slate-800/80 rounded-xl p-1 mt-2 mb-5">
           {(['starter', 'pro'] as Plan[]).map(p => (
             <button
               key={p}
-              onClick={() => setPlan(p)}
+              onClick={() => { if (!isStarter) setPlan(p); }}
+              disabled={isStarter && p === 'starter'}
+              title={isStarter && p === 'starter' ? 'Already purchased' : undefined}
               className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
-                plan === p
+                (isStarter ? 'pro' : plan) === p
                   ? 'bg-teal-600 text-white shadow-lg'
+                  : isStarter && p === 'starter'
+                  ? 'text-slate-600 cursor-not-allowed line-through'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              {PLAN_CONFIG[p].label}
+              {PLAN_CONFIG[p].label}{isStarter && p === 'starter' ? ' ✓' : ''}
             </button>
           ))}
         </div>
@@ -130,12 +155,27 @@ export default function UpgradePage() {
               >
                 {p === 'pro' && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-teal-500 text-white text-[10px] font-bold px-3 py-0.5 rounded-full">
-                    BEST VALUE
+                    {isStarter ? 'YOUR UPGRADE' : 'BEST VALUE'}
+                  </div>
+                )}
+                {isStarter && p === 'starter' && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-slate-600 text-slate-300 text-[10px] font-bold px-3 py-0.5 rounded-full">
+                    PURCHASED
                   </div>
                 )}
                 <p className="text-slate-500 text-[11px] uppercase tracking-wide mt-1">Lifetime</p>
-                <p className="text-white text-[2rem] font-extrabold leading-tight">${c.price}</p>
-                <p className="text-slate-500 text-[11px]">≈ KSh {c.kes}</p>
+                {isStarter && p === 'pro' ? (
+                  <>
+                    <p className="text-slate-500 text-[11px] line-through">${c.price}</p>
+                    <p className="text-white text-[2rem] font-extrabold leading-tight">$25</p>
+                    <p className="text-teal-400 text-[11px] font-semibold">You paid $45 ✓</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-white text-[2rem] font-extrabold leading-tight">${c.price}</p>
+                    <p className="text-slate-500 text-[11px]">≈ KSh {c.kes}</p>
+                  </>
+                )}
               </div>
             );
           })}
@@ -174,10 +214,16 @@ export default function UpgradePage() {
 
         {/* CTA section */}
         <div className="mt-auto">
-          <p className="text-slate-400 text-sm text-center mb-3">
-            14-day free trial, then{' '}
-            <span className="text-white font-semibold">${cfg.price} one-time</span>
-          </p>
+          {isStarter ? (
+            <p className="text-slate-400 text-sm text-center mb-3">
+              Pay the <span className="text-white font-semibold">$25 difference</span> to unlock all Pro features
+            </p>
+          ) : (
+            <p className="text-slate-400 text-sm text-center mb-3">
+              14-day free trial, then{' '}
+              <span className="text-white font-semibold">${displayPrice} one-time</span>
+            </p>
+          )}
 
           <button
             onClick={handlePay}
@@ -192,6 +238,8 @@ export default function UpgradePage() {
                 <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                 Redirecting to PesaPal…
               </span>
+            ) : isStarter ? (
+              'Upgrade to Pro — $25 →'
             ) : (
               `Get ${cfg.label} — $${cfg.price} →`
             )}

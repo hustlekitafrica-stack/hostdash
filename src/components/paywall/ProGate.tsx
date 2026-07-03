@@ -11,7 +11,7 @@ interface ProGateProps {
 
 export function ProGate({ feature, children }: ProGateProps) {
   const router = useRouter();
-  const { isPro, isLoaded } = useSubscription();
+  const { isPro, isStarter, isLoaded } = useSubscription();
 
   if (!isLoaded) {
     return (
@@ -44,16 +44,23 @@ export function ProGate({ feature, children }: ProGateProps) {
 
           <p className="text-teal-400 text-xs font-bold uppercase tracking-widest mb-2">Pro Feature</p>
           <h3 className="text-white text-lg font-bold mb-2">{feature}</h3>
-          <p className="text-slate-400 text-sm mb-6 leading-relaxed">
-            Upgrade to <span className="text-white font-semibold">HostDash Pro</span> to unlock {feature} and all other advanced features.
-          </p>
+          {isStarter ? (
+            <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+              You\'re on <span className="text-white font-semibold">Starter</span>. Pay just{' '}
+              <span className="text-teal-300 font-bold">$25 more</span> to unlock Pro features — lifetime access.
+            </p>
+          ) : (
+            <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+              Upgrade to <span className="text-white font-semibold">HostDash Pro</span> to unlock {feature} and all other advanced features.
+            </p>
+          )}
 
           <button
             onClick={() => router.push('/upgrade')}
             className="w-full py-3 rounded-xl font-bold text-white text-sm transition-all duration-200 hover:brightness-110 shadow-lg"
             style={{ background: 'linear-gradient(135deg, #0f766e, #0ea5e9)' }}
           >
-            ⚡ Upgrade to Pro — $70
+            {isStarter ? '⚡ Upgrade to Pro — $25' : '⚡ Upgrade to Pro — $70'}
           </button>
 
           <button

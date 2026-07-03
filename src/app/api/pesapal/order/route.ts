@@ -3,12 +3,14 @@ import { createClient } from '@/lib/supabase/server';
 import { publicSupabase } from '@/lib/supabase/public';
 import { submitOrder } from '@/lib/pesapal';
 
-const PLAN_AMOUNTS: Record<string, number> = { starter: 45, pro: 70 };
+const PLAN_AMOUNTS: Record<string, number> = { starter: 45, pro: 70, 'pro-upgrade': 25 };
 const CURRENCY = 'USD';
 
 export async function POST(request: NextRequest) {
-  const body   = await request.json().catch(() => ({})) as { plan?: string };
-  const plan   = body.plan === 'starter' ? 'starter' : 'pro';
+  const body = await request.json().catch(() => ({})) as { plan?: string };
+  const plan = (['starter', 'pro', 'pro-upgrade'] as string[]).includes(body.plan ?? '')
+    ? (body.plan as string)
+    : 'pro';
   const AMOUNT_USD = PLAN_AMOUNTS[plan];
   try {
     const supabase = await createClient();
@@ -22,11 +24,16 @@ export async function POST(request: NextRequest) {
 
     const { data: profile } = await publicSupabase
       .from('profiles')
-      .select('subscription_status, full_name, email')
+      .select('subscription_status, subscription_plan, full_name, email')
       .eq('id', user.id)
       .single();
 
-    if (profile?.subscription_status === 'paid') {
+    if (plan === 'pro-upgrade') {
+      const isStarter = profile?.subscription_status === 'paid' && profile?.subscription_plan === 'starter';
+      if (!isStarter) {
+        return NextResponse.json({ error: 'Pro upgrade is only available for Starter subscribers' }, { status: 400 });
+      }
+    } else if (profile?.subscription_status === 'paid') {
       return NextResponse.json({ error: 'Already subscribed' }, { status: 400 });
     }
 
@@ -40,7 +47,9 @@ export async function POST(request: NextRequest) {
       orderId,
       amount:       AMOUNT_USD,
       currency:     CURRENCY,
-      description:  plan === 'pro' ? 'HostDash Pro — Lifetime Access' : 'HostDash Starter — Lifetime Access',
+      description:  plan === 'pro'         ? 'HostDash Pro — Lifetime Access'
+                  : plan === 'pro-upgrade' ? 'HostDash Pro Upgrade — Lifetime Access'
+                  :                         'HostDash Starter — Lifetime Access',
       firstName,
       lastName,
       emailAddress: email,

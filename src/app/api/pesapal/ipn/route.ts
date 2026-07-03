@@ -34,7 +34,21 @@ async function handleIPN(request: NextRequest) {
         .single();
 
       if (payment?.user_id) {
-        const plan = (payment.amount_usd ?? 0) >= 70 ? 'pro' : 'starter';
+        const { data: currentProfile } = await publicSupabase
+          .from('profiles')
+          .select('subscription_plan')
+          .eq('id', payment.user_id)
+          .single();
+
+        const amount = payment.amount_usd ?? 0;
+        let plan: string;
+        if (amount >= 70) {
+          plan = 'pro';
+        } else if (amount >= 25 && currentProfile?.subscription_plan === 'starter') {
+          plan = 'pro'; // Upgrade from Starter
+        } else {
+          plan = 'starter';
+        }
 
         await Promise.all([
           publicSupabase
