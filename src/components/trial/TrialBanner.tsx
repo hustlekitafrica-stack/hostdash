@@ -46,7 +46,7 @@ export function TrialBanner() {
   const marginClass = collapsed ? 'lg:ml-20' : 'lg:ml-64';
 
   return (
-    <div className={`${bgClass} ${textColor} ${marginClass} px-4 py-2 flex items-center justify-between gap-4 text-sm flex-shrink-0 transition-all duration-300`}>
+    <div className={`${bgClass} ${textColor} ${marginClass} sticky top-[80px] lg:top-0 z-20 px-4 py-2 flex items-center justify-between gap-4 text-sm flex-shrink-0 transition-all duration-300`}>
       <span className="font-medium">{message}</span>
       <button
         onClick={() => router.push('/upgrade')}

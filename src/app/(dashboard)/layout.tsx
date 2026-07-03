@@ -112,11 +112,10 @@ export default function DashboardLayout({
         {/* Mobile Navigation - Visible only on mobile & tablet */}
         <MobileNav />
 
-        {/* Trial / expiry banner */}
-        <TrialBanner />
-
         {/* Page content - Add top padding on mobile to account for header + action buttons */}
         <main className={`flex-1 overflow-y-auto overflow-x-hidden lg:pt-0 pb-4 sm:pb-0 ${['/booking-calendar','/alerts','/guests','/unit-performance','/properties','/expenses','/reports','/settings','/help'].includes(pathname) ? 'pt-0' : 'pt-20'}`}>
+          {/* Trial / expiry banner — inside main so pt-20 clears the fixed mobile header */}
+          <TrialBanner />
           <BrandProvider>
             {children}
           </BrandProvider>
