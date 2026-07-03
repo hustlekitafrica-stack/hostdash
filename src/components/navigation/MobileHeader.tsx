@@ -1,6 +1,7 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface MobileHeaderProps {
   onMenuOpen: () => void;
@@ -20,6 +21,15 @@ export function MobileHeader({
   onGenerateReport 
 }: MobileHeaderProps) {
   const pathname = usePathname();
+  const router   = useRouter();
+  const [isPaid, setIsPaid] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/subscription')
+      .then(r => r.ok ? r.json() : null)
+      .then((d: { is_paid?: boolean } | null) => { if (d?.is_paid) setIsPaid(true); })
+      .catch(() => {});
+  }, []);
 
   const getPageTitle = () => {
     if (pathname === '/dashboard') return 'Dashboard';
@@ -58,7 +68,17 @@ export function MobileHeader({
         {/* Logo */}
         <h1 className="text-base font-bold text-gray-900">HostDash</h1>
 
-        <div className="w-10" />
+        {/* Upgrade button — hidden once paid */}
+        {isPaid ? (
+          <div className="w-10" />
+        ) : (
+          <button
+            onClick={() => router.push('/upgrade')}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-teal-500/50 bg-teal-50 text-teal-600 hover:bg-teal-100 text-[11px] font-semibold transition-colors"
+          >
+            ⚡ Upgrade
+          </button>
+        )}
       </div>
 
     </div>

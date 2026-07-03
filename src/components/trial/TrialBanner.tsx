@@ -34,7 +34,7 @@ export function TrialBanner() {
   const marginClass = collapsed ? 'lg:ml-20' : 'lg:ml-64';
 
   return (
-    <div className={`${marginClass} flex justify-end px-4 py-1.5 transition-all duration-300 flex-shrink-0`}>
+    <div className={`${marginClass} hidden lg:flex justify-end px-4 py-1.5 transition-all duration-300 flex-shrink-0`}>
       <button
         onClick={() => router.push('/upgrade')}
         className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-teal-500/40 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 text-xs font-semibold transition-colors"
