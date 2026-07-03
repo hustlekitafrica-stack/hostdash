@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { ReactNode } from 'react';
 import { useSubscription } from '@/lib/use-subscription';
+import { useCurrency } from '@/lib/use-currency';
 
 interface ProGateProps {
   feature: string;
@@ -12,6 +13,7 @@ interface ProGateProps {
 export function ProGate({ feature, children }: ProGateProps) {
   const router = useRouter();
   const { isPro, isStarter, isLoaded } = useSubscription();
+  const { formatLocal } = useCurrency();
 
   if (!isLoaded) {
     return (
@@ -62,6 +64,7 @@ export function ProGate({ feature, children }: ProGateProps) {
           >
             {isStarter ? '⚡ Upgrade to Pro — $25' : '⚡ Upgrade to Pro — $70'}
           </button>
+          {(() => { const loc = formatLocal(isStarter ? 25 : 70); return loc ? <p className="mt-1.5 text-slate-500 text-[11px]">{loc}</p> : null; })()}
 
           <button
             onClick={() => router.push('/upgrade')}

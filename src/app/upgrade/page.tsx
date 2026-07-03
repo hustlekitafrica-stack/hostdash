@@ -4,12 +4,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
+import { useCurrency } from '@/lib/use-currency';
 
 type Plan = 'starter' | 'pro';
 
 const PLAN_CONFIG = {
-  starter: { label: 'Starter', price: 45, kes: '6,000' },
-  pro:     { label: 'Pro',     price: 70, kes: '9,500' },
+  starter: { label: 'Starter', price: 45 },
+  pro:     { label: 'Pro',     price: 70 },
 } as const;
 
 const FEATURES: { label: string; starter: boolean; pro: boolean; star?: boolean }[] = [
@@ -39,6 +40,7 @@ export default function UpgradePage() {
   const [loading, setLoading]         = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [isStarter, setIsStarter]     = useState(false);
+  const { formatLocal }                = useCurrency();
 
   useEffect(() => {
     const supabase = createClient();
@@ -168,12 +170,15 @@ export default function UpgradePage() {
                   <>
                     <p className="text-slate-500 text-[11px] line-through">${c.price}</p>
                     <p className="text-white text-[2rem] font-extrabold leading-tight">$25</p>
+                    {formatLocal(25) && <p className="text-teal-400 text-[11px] font-semibold">{formatLocal(25)}</p>}
                     <p className="text-teal-400 text-[11px] font-semibold">You paid $45 ✓</p>
                   </>
                 ) : (
                   <>
                     <p className="text-white text-[2rem] font-extrabold leading-tight">${c.price}</p>
-                    <p className="text-slate-500 text-[11px]">≈ KSh {c.kes}</p>
+                    {formatLocal(c.price) && (
+                      <p className="text-slate-500 text-[11px]">{formatLocal(c.price)}</p>
+                    )}
                   </>
                 )}
               </div>

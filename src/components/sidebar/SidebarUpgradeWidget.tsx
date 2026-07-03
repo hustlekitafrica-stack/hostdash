@@ -2,10 +2,12 @@
 
 import { useRouter } from 'next/navigation';
 import { useSubscription } from '@/lib/use-subscription';
+import { useCurrency } from '@/lib/use-currency';
 
 export function SidebarUpgradeWidget({ collapsed }: { collapsed: boolean }) {
   const router = useRouter();
   const { isPro, isStarter, daysLeft, isExpired, isLoaded } = useSubscription();
+  const { formatLocal } = useCurrency();
 
   if (!isLoaded) return null;
 
@@ -50,6 +52,7 @@ export function SidebarUpgradeWidget({ collapsed }: { collapsed: boolean }) {
 
   /* ── STARTER — show $25 upgrade card ── */
   if (isStarter) {
+    const local25 = formatLocal(25);
     return (
       <div className="mx-2 px-3 py-3 rounded-xl bg-teal-900/30 border border-teal-700/40 space-y-2">
         <div className="flex items-center justify-between">
@@ -63,6 +66,7 @@ export function SidebarUpgradeWidget({ collapsed }: { collapsed: boolean }) {
         >
           ↑ Upgrade to Pro — $25
         </button>
+        {local25 && <p className="text-teal-500 text-[10px] text-center">{local25}</p>}
       </div>
     );
   }
