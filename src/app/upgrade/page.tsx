@@ -5,36 +5,44 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
 
-const FEATURES = [
-  { icon: '🏠', text: 'Unlimited property listings' },
-  { icon: '📅', text: 'Full booking calendar & iCal sync' },
-  { icon: '📊', text: 'Revenue reports & expense tracking' },
-  { icon: '📱', text: 'Automated SMS & email notifications' },
-  { icon: '🧾', text: 'Guest receipts & invoicing' },
-  { icon: '⭐', text: 'Guest review management' },
-  { icon: '🔔', text: 'Alerts, reminders & daily ops sheet' },
-  { icon: '📡', text: 'Channel manager (Airbnb, Booking.com…)' },
-  { icon: '🔒', text: 'Lifetime access — no recurring fees' },
+type Plan = 'starter' | 'pro';
+
+const PLAN_CONFIG = {
+  starter: { label: 'Starter', price: 45, kes: '6,000' },
+  pro:     { label: 'Pro',     price: 70, kes: '9,500' },
+} as const;
+
+const FEATURES: { label: string; starter: boolean; pro: boolean; star?: boolean }[] = [
+  { label: 'Booking calendar',              starter: true,  pro: true  },
+  { label: 'Guest management',              starter: true,  pro: true  },
+  { label: 'Expense tracking',              starter: true,  pro: true  },
+  { label: 'SMS notifications',             starter: true,  pro: true  },
+  { label: 'Receipt generation',            starter: true,  pro: true  },
+  { label: 'Basic reports',                 starter: true,  pro: true  },
+  { label: 'Unlimited property units',      starter: false, pro: true, star: true },
+  { label: 'iCal sync (Airbnb, Booking.com)', starter: false, pro: true, star: true },
+  { label: 'Unit performance analytics',    starter: false, pro: true, star: true },
+  { label: 'Automated review requests',     starter: false, pro: true, star: true },
+  { label: 'WhatsApp notifications',        starter: false, pro: true, star: true },
+  { label: 'API access',                    starter: false, pro: true, star: true },
 ];
 
-const PAYMENT_METHODS = [
-  { label: 'Visa',         color: '#1A1F71', bg: '#fff', text: 'VISA' },
-  { label: 'Mastercard',   color: '#EB001B', bg: '#fff', text: 'MC' },
-  { label: 'M-Pesa',       color: '#4CAF50', bg: '#fff', text: 'M-PESA' },
-  { label: 'Airtel Money', color: '#E40000', bg: '#fff', text: 'AIRTEL' },
-];
+function Check({ on }: { on: boolean }) {
+  return on
+    ? <span className="text-teal-400 font-bold text-sm">✓</span>
+    : <span className="text-slate-600 text-sm">—</span>;
+}
 
 export default function UpgradePage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [plan, setPlan]               = useState<Plan>('pro');
+  const [loading, setLoading]         = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
-  const [userEmail, setUserEmail] = useState('');
 
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => {
       if (!data.user) { router.push('/auth/login?next=/upgrade'); return; }
-      setUserEmail(data.user.email ?? '');
       setCheckingAuth(false);
     });
   }, [router]);
@@ -42,14 +50,16 @@ export default function UpgradePage() {
   const handlePay = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/pesapal/order', { method: 'POST' });
+      const res  = await fetch('/api/pesapal/order', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ plan }),
+      });
       const json = await res.json() as { redirect_url?: string; error?: string };
-
       if (!res.ok || json.error) {
         toast.error(json.error || 'Could not initiate payment. Try again.');
         return;
       }
-
       window.location.href = json.redirect_url!;
     } catch {
       toast.error('Network error. Please try again.');
@@ -60,116 +70,159 @@ export default function UpgradePage() {
 
   if (checkingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-[#0f0f13]">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-teal-400" />
       </div>
     );
   }
 
+  const cfg = PLAN_CONFIG[plan];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+    <div className="min-h-screen bg-[#0f0f13] flex flex-col">
+
       {/* Header */}
-      <header className="px-6 py-4 flex items-center justify-between border-b border-slate-700/50">
+      <header className="flex items-center justify-between px-5 pt-5 pb-3">
+        <button
+          onClick={() => router.push('/dashboard')}
+          className="w-9 h-9 flex items-center justify-center rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors text-base"
+        >
+          ✕
+        </button>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold text-sm">HD</div>
-          <span className="text-white font-bold text-base">HostDash</span>
+          <div className="w-7 h-7 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold text-xs">HD</div>
+          <span className="text-white font-bold text-base tracking-tight">HostDash</span>
         </div>
-        <span className="text-slate-400 text-sm">{userEmail}</span>
+        <div className="w-9" />
       </header>
 
-      {/* Hero */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-        <div className="w-full max-w-4xl">
+      <main className="flex-1 flex flex-col max-w-sm mx-auto w-full px-4 pb-8">
 
-          {/* Badge */}
-          <div className="flex justify-center mb-6">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-400 text-sm font-medium">
-              ✦ One-time payment · No subscription
-            </span>
+        {/* Tab switcher */}
+        <div className="flex bg-slate-800/80 rounded-xl p-1 mt-4 mb-5">
+          {(['starter', 'pro'] as Plan[]).map(p => (
+            <button
+              key={p}
+              onClick={() => setPlan(p)}
+              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                plan === p
+                  ? 'bg-teal-600 text-white shadow-lg'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {PLAN_CONFIG[p].label}
+            </button>
+          ))}
+        </div>
+
+        {/* Pricing cards */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          {(['starter', 'pro'] as Plan[]).map(p => {
+            const c   = PLAN_CONFIG[p];
+            const sel = plan === p;
+            return (
+              <div
+                key={p}
+                onClick={() => setPlan(p)}
+                className={`relative rounded-2xl p-4 border-2 cursor-pointer transition-all duration-200 ${
+                  sel ? 'border-teal-500 bg-slate-800' : 'border-slate-700/60 bg-slate-800/30'
+                }`}
+              >
+                {p === 'pro' && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap bg-teal-500 text-white text-[10px] font-bold px-3 py-0.5 rounded-full">
+                    BEST VALUE
+                  </div>
+                )}
+                <p className="text-slate-500 text-[11px] uppercase tracking-wide mt-1">Lifetime</p>
+                <p className="text-white text-[2rem] font-extrabold leading-tight">${c.price}</p>
+                <p className="text-slate-500 text-[11px]">≈ KSh {c.kes}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Feature comparison table */}
+        <div className="mb-6 rounded-2xl bg-slate-800/30 border border-slate-800 overflow-hidden">
+          <div className="flex items-center justify-end gap-0 px-4 py-2.5 border-b border-slate-800 bg-slate-800/60">
+            <span className="text-slate-400 text-xs font-semibold flex-1">Feature</span>
+            <span className={`text-xs font-bold w-14 text-center ${
+              plan === 'starter' ? 'text-teal-400' : 'text-slate-500'
+            }`}>Starter</span>
+            <span className={`text-xs font-bold w-12 text-center ${
+              plan === 'pro' ? 'text-teal-400' : 'text-slate-500'
+            }`}>Pro</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold text-white text-center mb-4 leading-tight">
-            Unlock <span className="text-teal-400">HostDash Pro</span>
-          </h1>
-          <p className="text-slate-400 text-center text-lg mb-12 max-w-xl mx-auto">
-            Everything you need to manage your properties professionally — pay once, use forever.
+          {FEATURES.map((f, i) => (
+            <div
+              key={f.label}
+              className={`flex items-center px-4 py-2.5 gap-2 ${
+                i < FEATURES.length - 1 ? 'border-b border-slate-800/60' : ''
+              } ${f.star ? 'bg-teal-950/20' : ''}`}
+            >
+              {f.star
+                ? <span className="text-teal-500 text-[10px] flex-shrink-0">★</span>
+                : <span className="w-[10px] flex-shrink-0" />}
+              <span className={`flex-1 text-xs ${
+                f.star ? 'text-slate-200 font-medium' : 'text-slate-400'
+              }`}>{f.label}</span>
+              <span className="w-14 flex justify-center"><Check on={f.starter} /></span>
+              <span className="w-12 flex justify-center"><Check on={f.pro} /></span>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA section */}
+        <div className="mt-auto">
+          <p className="text-slate-400 text-sm text-center mb-3">
+            14-day free trial, then{' '}
+            <span className="text-white font-semibold">${cfg.price} one-time</span>
           </p>
 
-          <div className="grid lg:grid-cols-2 gap-8 items-start">
-            {/* Feature list */}
-            <div className="space-y-3">
-              {FEATURES.map((f) => (
-                <div key={f.text} className="flex items-center gap-3">
-                  <span className="text-xl w-8 text-center flex-shrink-0">{f.icon}</span>
-                  <span className="text-slate-200 text-sm">{f.text}</span>
-                </div>
-              ))}
-            </div>
+          <button
+            onClick={handlePay}
+            disabled={loading}
+            className="w-full py-4 rounded-2xl font-bold text-white text-base transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg"
+            style={{ background: loading ? '#0d6c62' : 'linear-gradient(135deg, #0f766e, #0ea5e9)' }}
+            onMouseEnter={e => { if (!loading) e.currentTarget.style.filter = 'brightness(1.1)'; }}
+            onMouseLeave={e  => { e.currentTarget.style.filter = 'none'; }}
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                Redirecting to PesaPal…
+              </span>
+            ) : (
+              `Get ${cfg.label} — $${cfg.price} →`
+            )}
+          </button>
 
-            {/* Pricing card */}
-            <div className="bg-slate-800/60 border border-slate-700 rounded-2xl p-8 shadow-2xl">
-              {/* Price */}
-              <div className="text-center mb-8">
-                <p className="text-slate-400 text-sm font-medium uppercase tracking-widest mb-2">HostDash Pro</p>
-                <div className="flex items-end justify-center gap-2 mb-1">
-                  <span className="text-6xl font-extrabold text-white">$45</span>
-                  <span className="text-slate-400 mb-3 text-lg">USD</span>
-                </div>
-                <p className="text-slate-500 text-sm">≈ KSh 6,000 · One-time · Lifetime access</p>
-              </div>
+          <div className="flex gap-2 justify-center flex-wrap mt-4">
+            {['VISA', 'MC', 'M-PESA', 'AIRTEL'].map(m => (
+              <span key={m} className="px-2.5 py-1 rounded-md text-[11px] font-bold border border-slate-700 bg-slate-800 text-slate-300">
+                {m}
+              </span>
+            ))}
+          </div>
 
-              {/* Pay button */}
-              <button
-                onClick={handlePay}
-                disabled={loading}
-                className="w-full py-4 rounded-xl font-bold text-white text-lg transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
-                style={{ background: loading ? '#0d6c62' : 'linear-gradient(135deg, #0f766e, #0ea5e9)' }}
-                onMouseEnter={e => { if (!loading) e.currentTarget.style.filter = 'brightness(1.1)'; }}
-                onMouseLeave={e => { e.currentTarget.style.filter = 'none'; }}
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                    Redirecting to PesaPal…
-                  </span>
-                ) : (
-                  '💳 Pay with PesaPal →'
-                )}
-              </button>
+          <p className="text-slate-600 text-[11px] text-center mt-3">
+            Secured by PesaPal · 256-bit SSL · No recurring fees
+          </p>
 
-              {/* Payment method badges */}
-              <div className="flex gap-2 justify-center flex-wrap mt-5">
-                {PAYMENT_METHODS.map(m => (
-                  <span
-                    key={m.label}
-                    className="px-3 py-1 rounded-md text-xs font-bold border border-slate-600 bg-slate-700 text-slate-200"
-                  >
-                    {m.text}
-                  </span>
-                ))}
-              </div>
-
-              <p className="text-slate-500 text-xs text-center mt-5">
-                Secured by PesaPal · 256-bit SSL encryption
-              </p>
-
-              <div className="mt-6 pt-6 border-t border-slate-700 text-center">
-                <p className="text-slate-500 text-xs">
-                  Already paid?{' '}
-                  <a href="mailto:support@hostdash.app" className="text-teal-400 hover:underline">
-                    Contact support
-                  </a>
-                </p>
-                <button
-                  onClick={() => router.push('/dashboard')}
-                  className="mt-2 text-slate-500 text-xs hover:text-slate-400 transition-colors"
-                >
-                  ← Back to dashboard
-                </button>
-              </div>
-            </div>
+          <div className="flex items-center justify-center gap-4 mt-3">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="text-slate-600 text-xs hover:text-slate-400 transition-colors"
+            >
+              Back to dashboard
+            </button>
+            <span className="text-slate-700">·</span>
+            <a href="mailto:support@hostdash.app" className="text-slate-600 text-xs hover:text-slate-400 transition-colors">
+              Contact support
+            </a>
           </div>
         </div>
+
       </main>
     </div>
   );

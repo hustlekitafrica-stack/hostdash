@@ -1,12 +1,15 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { publicSupabase } from '@/lib/supabase/public';
 import { submitOrder } from '@/lib/pesapal';
 
-const AMOUNT_USD = 45;
-const CURRENCY   = 'USD';
+const PLAN_AMOUNTS: Record<string, number> = { starter: 45, pro: 70 };
+const CURRENCY = 'USD';
 
-export async function POST() {
+export async function POST(request: NextRequest) {
+  const body   = await request.json().catch(() => ({})) as { plan?: string };
+  const plan   = body.plan === 'starter' ? 'starter' : 'pro';
+  const AMOUNT_USD = PLAN_AMOUNTS[plan];
   try {
     const supabase = await createClient();
     const { data: { session } } = await supabase.auth.getSession();
@@ -37,7 +40,7 @@ export async function POST() {
       orderId,
       amount:       AMOUNT_USD,
       currency:     CURRENCY,
-      description:  'HostDash Pro — Lifetime Access',
+      description:  plan === 'pro' ? 'HostDash Pro — Lifetime Access' : 'HostDash Starter — Lifetime Access',
       firstName,
       lastName,
       emailAddress: email,
