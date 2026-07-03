@@ -106,7 +106,7 @@ export default function UpgradePage() {
     <div className="h-screen bg-[#0f0f13] flex flex-col overflow-hidden">
 
       {/* Header */}
-      <header className="flex items-center justify-between px-5 pt-4 pb-2">
+      <header className="flex items-center justify-between px-5 pt-3 pb-1">
         <button
           onClick={() => router.push('/dashboard')}
           className="w-9 h-9 flex items-center justify-center rounded-full bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors text-base"
@@ -120,7 +120,7 @@ export default function UpgradePage() {
         <div className="w-9" />
       </header>
 
-      <main className="flex-1 flex flex-col max-w-sm mx-auto w-full px-4 pb-4">
+      <main className="flex-1 flex flex-col max-w-sm mx-auto w-full px-4 pb-3">
 
         {/* Starter upgrade banner */}
         {isStarter && (
@@ -132,7 +132,7 @@ export default function UpgradePage() {
         )}
 
         {/* Tab switcher */}
-        <div className="flex bg-slate-800/80 rounded-xl p-1 mt-1 mb-3">
+        <div className="flex bg-slate-800/80 rounded-xl p-1 mt-1 mb-2">
           {(['starter', 'pro'] as Plan[]).map(p => (
             <button
               key={p}
@@ -153,7 +153,7 @@ export default function UpgradePage() {
         </div>
 
         {/* Pricing cards */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="grid grid-cols-2 gap-3 mb-2">
           {(['starter', 'pro'] as Plan[]).map(p => {
             const c   = PLAN_CONFIG[p];
             const sel = plan === p;
@@ -161,7 +161,7 @@ export default function UpgradePage() {
               <div
                 key={p}
                 onClick={() => setPlan(p)}
-                className={`relative rounded-2xl px-4 py-2.5 border-2 cursor-pointer transition-all duration-200 ${
+                className={`relative rounded-2xl px-4 py-2 border-2 cursor-pointer transition-all duration-200 ${
                   sel ? 'border-teal-500 bg-slate-800' : 'border-slate-700/60 bg-slate-800/30'
                 }`}
               >
@@ -205,7 +205,7 @@ export default function UpgradePage() {
           </div>
 
           {plan === 'pro' && (
-            <div className="flex items-center px-4 py-2 gap-2.5 border-b border-slate-800/60">
+            <div className="flex items-center px-4 py-1.5 gap-2.5 border-b border-slate-800/60">
               <span className="text-teal-400 font-bold text-sm flex-shrink-0">✓</span>
               <span className="flex-1 text-xs text-slate-400">All Starter features</span>
             </div>
@@ -213,7 +213,7 @@ export default function UpgradePage() {
           {FEATURES.filter(f => plan === 'pro' ? f.star : f.starter).map((f, i, arr) => (
             <div
               key={f.label}
-              className={`flex items-center px-4 py-2 gap-2.5 ${
+              className={`flex items-center px-4 py-1.5 gap-2.5 ${
                 i < arr.length - 1 ? 'border-b border-slate-800/60' : ''
               } ${f.star && plan === 'pro' ? 'bg-teal-950/20' : ''}`}
             >
@@ -249,7 +249,7 @@ export default function UpgradePage() {
           <button
             onClick={handlePay}
             disabled={loading}
-            className="w-full py-4 rounded-2xl font-bold text-white text-base transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg"
+            className="w-full py-3 rounded-2xl font-bold text-white text-base transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg"
             style={{ background: loading ? '#0d6c62' : 'linear-gradient(135deg, #0f766e, #0ea5e9)' }}
             onMouseEnter={e => { if (!loading) e.currentTarget.style.filter = 'brightness(1.1)'; }}
             onMouseLeave={e  => { e.currentTarget.style.filter = 'none'; }}
