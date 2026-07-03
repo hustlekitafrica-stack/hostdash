@@ -14,12 +14,19 @@ const DEFAULT_STATUS: SubStatus = { is_paid: false, is_expired: false, days_left
 export function TrialBanner() {
   const router = useRouter();
   const [status, setStatus] = useState<SubStatus>(DEFAULT_STATUS);
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     fetch('/api/subscription')
       .then(r => r.ok ? r.json() : null)
       .then((d: SubStatus | null) => { if (d) setStatus(d); })
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: Event) => setCollapsed((e as CustomEvent).detail.collapsed);
+    window.addEventListener('sidebarToggle', handler);
+    return () => window.removeEventListener('sidebarToggle', handler);
   }, []);
 
   if (status.is_paid) return null;
@@ -36,8 +43,10 @@ export function TrialBanner() {
       ? 'Last day of your free trial!'
       : `${daysLeft} day${daysLeft !== 1 ? 's' : ''} left in your free trial.`;
 
+  const marginClass = collapsed ? 'lg:ml-20' : 'lg:ml-64';
+
   return (
-    <div className={`${bgClass} ${textColor} px-4 py-2 flex items-center justify-between gap-4 text-sm flex-shrink-0`}>
+    <div className={`${bgClass} ${textColor} ${marginClass} px-4 py-2 flex items-center justify-between gap-4 text-sm flex-shrink-0 transition-all duration-300`}>
       <span className="font-medium">{message}</span>
       <button
         onClick={() => router.push('/upgrade')}
