@@ -29,17 +29,19 @@ async function handleIPN(request: NextRequest) {
     if (status.payment_status_description === PESAPAL_PAID_STATUS) {
       const { data: payment } = await publicSupabase
         .from('platform_payments')
-        .select('user_id')
+        .select('user_id, amount_usd')
         .eq('pesapal_order_id', orderTrackingId)
         .single();
 
       if (payment?.user_id) {
+        const plan = (payment.amount_usd ?? 0) >= 70 ? 'pro' : 'starter';
+
         await Promise.all([
           publicSupabase
             .from('profiles')
             .update({
               subscription_status: 'paid',
-              subscription_plan:   'lifetime',
+              subscription_plan:   plan,
               pesapal_order_id:    orderTrackingId,
             })
             .eq('id', payment.user_id),

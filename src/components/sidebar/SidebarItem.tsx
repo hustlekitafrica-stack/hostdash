@@ -10,6 +10,7 @@ interface SidebarItemProps {
   isActive: boolean;
   collapsed: boolean;
   badge?: number;
+  locked?: boolean;
 }
 
 export function SidebarItem({
@@ -19,6 +20,7 @@ export function SidebarItem({
   isActive,
   collapsed,
   badge,
+  locked,
 }: SidebarItemProps) {
   return (
     <Link href={href}>
@@ -59,10 +61,22 @@ export function SidebarItem({
           </span>
         )}
 
+        {/* Lock badge */}
+        {locked && !collapsed && (
+          <span className="ml-auto text-[10px] text-slate-500 border border-slate-700 rounded px-1 py-0.5 leading-none">
+            PRO
+          </span>
+        )}
+        {locked && collapsed && (
+          <span className="absolute top-1 right-1 text-[8px] text-slate-500">
+            🔒
+          </span>
+        )}
+
         {/* Tooltip when collapsed */}
         {collapsed && (
           <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
-            {label}
+            {label}{locked ? ' (Pro)' : ''}
           </div>
         )}
       </div>

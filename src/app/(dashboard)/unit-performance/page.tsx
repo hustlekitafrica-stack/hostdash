@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { ProGate } from '@/components/paywall/ProGate';
 
 interface Unit {
   id: string;
@@ -117,6 +118,7 @@ export default function UnitPerformancePage() {
   const fmtK = (n: number) => n >= 1000 ? `${Math.round(n / 1000)}K` : `${n}`;
 
   return (
+    <ProGate feature="Unit Performance Analytics">
     <div className="min-h-screen bg-gray-50">
       {/* Sticky Top Header */}
       <div className="sticky top-0 z-30 bg-white border-b border-gray-200">
@@ -379,5 +381,6 @@ export default function UnitPerformancePage() {
       </div>
       </div>
     </div>
+    </ProGate>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ProGate } from '@/components/paywall/ProGate';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -187,6 +188,7 @@ export default function IntegrationsPage() {
   ];
 
   return (
+    <ProGate feature="Integrations & Channel Manager">
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-surface-900">Integrations</h1>
@@ -470,5 +472,6 @@ export default function IntegrationsPage() {
         </div>
       </Modal>
     </div>
+    </ProGate>
   );
 }

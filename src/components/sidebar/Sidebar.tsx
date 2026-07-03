@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { SidebarItem } from './SidebarItem';
 import { SidebarSection } from './SidebarSection';
 import { SidebarUpgradeWidget } from './SidebarUpgradeWidget';
+import { useSubscription } from '@/lib/use-subscription';
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -15,6 +16,7 @@ interface SidebarProps {
 export function Sidebar({ isOpen = true, onClose, isMobile = false }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const { isPro } = useSubscription();
   const [userEmail, setUserEmail] = useState('');
   const [alertCount, setAlertCount] = useState(0);
 
@@ -204,6 +206,7 @@ export function Sidebar({ isOpen = true, onClose, isMobile = false }: SidebarPro
             href="/unit-performance"
             isActive={isActive('/unit-performance')}
             collapsed={collapsed}
+            locked={!isPro}
           />
           <SidebarItem
             icon={
