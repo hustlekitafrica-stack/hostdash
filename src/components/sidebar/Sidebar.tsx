@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { SidebarItem } from './SidebarItem';
 import { SidebarSection } from './SidebarSection';
+import { SidebarUpgradeWidget } from './SidebarUpgradeWidget';
 
 interface SidebarProps {
   isOpen?: boolean;
@@ -369,9 +370,10 @@ export function Sidebar({ isOpen = true, onClose, isMobile = false }: SidebarPro
         </SidebarSection>
       </div>
 
-      {/* User Section */}
-      <div className="px-2 py-4 border-t border-slate-800">
-        </div>
+      {/* Upgrade / Trial Section */}
+      <div className="py-3 border-t border-slate-800">
+        <SidebarUpgradeWidget collapsed={collapsed} />
+      </div>
     </div>
   );
 }
