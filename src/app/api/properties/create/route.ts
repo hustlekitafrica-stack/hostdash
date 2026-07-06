@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { propertyBasicSchema, propertyPricingSchema } from '@/lib/validation/property';
+import { canCreateProperty } from '@/lib/plan-limits';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -13,6 +14,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: { message: 'Unauthorized' } },
         { status: 401 }
+      );
+    }
+
+    // Enforce plan-based property limit
+    const check = await canCreateProperty(supabase, user.id);
+    if (!check.allowed) {
+      return NextResponse.json(
+        { error: { message: `Starter plan allows up to ${check.limit} properties. Upgrade to Pro for unlimited.` } },
+        { status: 403 }
       );
     }
 

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { sendWhatsApp, buildGuestBookingConfirmedWA, buildAdminBookingConfirmedWA } from '@/lib/whatsapp';
 
 export async function POST(request: NextRequest) {
   try {
@@ -186,6 +187,43 @@ export async function POST(request: NextRequest) {
         payment_method: 'cash',
         paid_at: new Date().toISOString(),
       });
+    }
+
+    // Send WhatsApp notifications for confirmed bookings (Pro users only, non-blocking)
+    if (booking && !is_blocked && status === 'confirmed' && guest_phone) {
+      (async () => {
+        try {
+          const { data: hostProfile } = await supabase
+            .from('profiles')
+            .select('subscription_plan, subscription_status, whatsapp_phone')
+            .eq('id', userId)
+            .single();
+          const isPro = hostProfile?.subscription_status === 'paid' && hostProfile?.subscription_plan === 'pro';
+          if (!isPro || !process.env.WHATSAPP_FROM) return;
+
+          // Get property name
+          const { data: prop } = await supabase.from('properties').select('name').eq('id', property_id).single();
+          const propName = prop?.name ?? 'your property';
+          const ref = booking.id ?? '';
+
+          // Send to guest
+          await sendWhatsApp(guest_phone, buildGuestBookingConfirmedWA({
+            guestName: resolvedName, propertyName: propName,
+            checkIn: check_in, checkOut: check_out, nights, total: totalAmount, ref,
+          }));
+
+          // Send to admin
+          const adminPhone = hostProfile?.whatsapp_phone || process.env.ADMIN_PHONE;
+          if (adminPhone) {
+            await sendWhatsApp(adminPhone, buildAdminBookingConfirmedWA({
+              guestName: resolvedName, guestPhone: guest_phone, propertyName: propName,
+              checkIn: check_in, checkOut: check_out, amount: totalAmount, ref,
+            }));
+          }
+        } catch (waErr) {
+          console.error('[WhatsApp booking notify]', waErr);
+        }
+      })();
     }
 
     return NextResponse.json({ booking });

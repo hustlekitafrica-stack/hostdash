@@ -1,14 +1,20 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { authenticateApiKey } from '@/lib/api-auth';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     let userId = process.env.STAY_HOST_USER_ID ?? '';
     if (!userId) {
       const supabase = await createClient();
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      userId = session.user.id;
+      if (session?.user) {
+        userId = session.user.id;
+      } else {
+        const apiUser = await authenticateApiKey(request);
+        if (!apiUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        userId = apiUser.userId;
+      }
     }
 
     const supabase = await createClient();

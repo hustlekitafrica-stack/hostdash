@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Tabs, TabContent } from '@/components/ui/Tabs';
+import { ProGate } from '@/components/paywall/ProGate';
 
 export default function APIDocsPage() {
   const [selectedEndpoint, setSelectedEndpoint] = useState('auth-register');
@@ -141,6 +142,7 @@ export default function APIDocsPage() {
   ];
 
   return (
+    <ProGate feature="API Access">
     <div className="min-h-screen bg-surface-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
@@ -410,5 +412,6 @@ print(data)`}
         </Tabs>
       </div>
     </div>
+    </ProGate>
   );
 }

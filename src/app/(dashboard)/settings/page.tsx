@@ -3,8 +3,17 @@
 import { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { createClient } from '@/lib/supabase/client';
+import { useSubscription } from '@/lib/use-subscription';
 
-type Tab = 'general' | 'brand' | 'categories' | 'tax' | 'account';
+type Tab = 'general' | 'brand' | 'categories' | 'tax' | 'notifications' | 'api' | 'account';
+
+interface ApiKeyEntry {
+  id: string;
+  key_prefix: string;
+  label: string;
+  created_at: string;
+  last_used_at: string | null;
+}
 type TaxLine = { label: string; rate: string };
 
 const COLOR_PRESETS = [
@@ -27,9 +36,21 @@ function isValidHex(v: string) { return /^#[0-9a-fA-F]{6}$/.test(v); }
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 export default function SettingsPage() {
+  const { isPro, isLoaded: subLoaded } = useSubscription();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [userEmail, setUserEmail] = useState('admin@hostdash.app');
   const [activeTab, setActiveTab] = useState<Tab>('general');
+
+  // Notifications tab state
+  const [whatsappPhone, setWhatsappPhone] = useState('');
+  const [waSaving, setWaSaving] = useState(false);
+
+  // API Keys tab state
+  const [apiKeys, setApiKeys] = useState<ApiKeyEntry[]>([]);
+  const [apiKeysLoading, setApiKeysLoading] = useState(false);
+  const [newKeyLabel, setNewKeyLabel] = useState('Default');
+  const [generatedKey, setGeneratedKey] = useState<string | null>(null);
+  const [keyGenerating, setKeyGenerating] = useState(false);
 
   // General tab state
   const [businessName, setBusinessName] = useState('');
@@ -115,11 +136,12 @@ export default function SettingsPage() {
       // Load KRA + tax config from profiles
       const { data: profile } = await supabase
         .from('profiles')
-        .select('kra_pin, tax_lines, logo_url, favicon_url')
+        .select('kra_pin, tax_lines, logo_url, favicon_url, whatsapp_phone')
         .eq('id', data.user.id)
         .maybeSingle();
       if (profile) {
         setKraPin(profile.kra_pin ?? '');
+        setWhatsappPhone(profile.whatsapp_phone ?? '');
         const tl = Array.isArray(profile.tax_lines) ? profile.tax_lines : [];
         setTaxLines(tl.map((t: any) => ({ label: t.label ?? '', rate: String(t.rate ?? '') })));
         if (profile.logo_url) {
@@ -286,11 +308,71 @@ export default function SettingsPage() {
     }
   };
 
+  // ── WhatsApp save handler ──
+  const handleSaveWhatsApp = async () => {
+    setWaSaving(true);
+    try {
+      const res = await fetch('/api/subscription', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ whatsapp_phone: whatsappPhone.trim() || null }),
+      });
+      if (!res.ok) { toast.error('Failed to save'); return; }
+      toast.success('WhatsApp number saved');
+    } catch { toast.error('Network error'); }
+    finally { setWaSaving(false); }
+  };
+
+  // ── API Keys handlers ──
+  const loadApiKeys = async () => {
+    setApiKeysLoading(true);
+    try {
+      const res = await fetch('/api/api-keys');
+      if (res.ok) { const d = await res.json(); setApiKeys(d.keys ?? []); }
+    } catch { /* ignore */ }
+    finally { setApiKeysLoading(false); }
+  };
+
+  const handleGenerateKey = async () => {
+    setKeyGenerating(true);
+    setGeneratedKey(null);
+    try {
+      const res = await fetch('/api/api-keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ label: newKeyLabel.trim() || 'Default' }),
+      });
+      const d = await res.json();
+      if (res.ok && d.raw_key) {
+        setGeneratedKey(d.raw_key);
+        setNewKeyLabel('Default');
+        loadApiKeys();
+        toast.success('API key generated');
+      } else {
+        toast.error(d.error ?? 'Failed to generate key');
+      }
+    } catch { toast.error('Network error'); }
+    finally { setKeyGenerating(false); }
+  };
+
+  const handleRevokeKey = async (id: string) => {
+    if (!confirm('Revoke this API key? This cannot be undone.')) return;
+    try {
+      const res = await fetch(`/api/api-keys?id=${id}`, { method: 'DELETE' });
+      if (res.ok) { loadApiKeys(); toast.success('Key revoked'); }
+      else toast.error('Failed to revoke');
+    } catch { toast.error('Network error'); }
+  };
+
+  useEffect(() => { if (activeTab === 'api' && isPro) loadApiKeys(); }, [activeTab, isPro]);
+
   const tabs: { id: Tab; label: string }[] = [
     { id: 'general', label: 'General' },
     { id: 'brand', label: 'Brand' },
     { id: 'categories', label: 'Expenses' },
     { id: 'tax', label: 'Tax & KRA' },
+    { id: 'notifications', label: 'Notifications' },
+    ...(isPro ? [{ id: 'api' as Tab, label: 'API Keys' }] : []),
     { id: 'account', label: 'Account' },
   ];
 
@@ -717,6 +799,138 @@ export default function SettingsPage() {
               >
                 {taxSaving ? 'Saving…' : 'Save Tax Settings'}
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── NOTIFICATIONS TAB ── */}
+        {activeTab === 'notifications' && (
+          <div className="space-y-6 max-w-3xl">
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <h2 className="text-base font-bold text-gray-900 mb-1">WhatsApp Notifications</h2>
+              <p className="text-sm text-gray-500 mb-5">
+                {isPro
+                  ? 'Enter your WhatsApp number to receive booking notifications via WhatsApp.'
+                  : 'Upgrade to Pro to enable automated WhatsApp notifications for bookings.'}
+              </p>
+              {isPro ? (
+                <>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp Phone Number</label>
+                    <input
+                      type="tel"
+                      value={whatsappPhone}
+                      onChange={e => setWhatsappPhone(e.target.value)}
+                      placeholder="+254 7XX XXX XXX"
+                      className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">Used for booking confirmations and admin alerts.</p>
+                  </div>
+                  <button
+                    onClick={handleSaveWhatsApp}
+                    disabled={waSaving}
+                    className="px-5 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-60"
+                  >
+                    {waSaving ? 'Saving…' : 'Save WhatsApp Number'}
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => window.location.href = '/upgrade'}
+                  className="px-5 py-2 rounded-lg text-sm font-semibold text-white transition-all hover:brightness-110"
+                  style={{ background: 'linear-gradient(135deg, #0f766e, #0ea5e9)' }}
+                >
+                  Upgrade to Pro
+                </button>
+              )}
+            </div>
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <h2 className="text-base font-bold text-gray-900 mb-1">SMS Notifications</h2>
+              <p className="text-sm text-gray-500 mb-2">SMS notifications are enabled for all plans. Booking confirmations, requests, and reminders are sent automatically.</p>
+              <span className="inline-block px-3 py-1 bg-green-50 text-green-700 text-xs font-semibold rounded-full border border-green-200">Active</span>
+            </div>
+          </div>
+        )}
+
+        {/* ── API KEYS TAB (Pro only) ── */}
+        {activeTab === 'api' && isPro && (
+          <div className="space-y-6 max-w-3xl">
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <h2 className="text-base font-bold text-gray-900 mb-1">API Keys</h2>
+              <p className="text-sm text-gray-500 mb-5">Generate API keys to access the HostDash API programmatically.</p>
+
+              {generatedKey && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-5">
+                  <p className="text-sm font-semibold text-green-800 mb-1">New API Key Generated</p>
+                  <p className="text-xs text-green-700 mb-2">Copy it now — you won&apos;t be able to see it again.</p>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 bg-white px-3 py-2 rounded border border-green-300 text-sm font-mono text-green-900 break-all select-all">
+                      {generatedKey}
+                    </code>
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(generatedKey); toast.success('Copied!'); }}
+                      className="px-3 py-2 bg-green-500 text-white text-xs font-semibold rounded-lg hover:bg-green-600 transition-colors"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-end gap-3 mb-6">
+                <div className="flex-1 max-w-xs">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Key Label</label>
+                  <input
+                    type="text"
+                    value={newKeyLabel}
+                    onChange={e => setNewKeyLabel(e.target.value)}
+                    placeholder="e.g. My Script"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+                <button
+                  onClick={handleGenerateKey}
+                  disabled={keyGenerating}
+                  className="px-5 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-60"
+                >
+                  {keyGenerating ? 'Generating…' : 'Generate Key'}
+                </button>
+              </div>
+
+              {apiKeysLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-400" />
+                </div>
+              ) : apiKeys.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-6">No API keys yet. Generate one above.</p>
+              ) : (
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="text-left px-4 py-2 font-medium text-gray-600">Key</th>
+                        <th className="text-left px-4 py-2 font-medium text-gray-600">Label</th>
+                        <th className="text-left px-4 py-2 font-medium text-gray-600">Created</th>
+                        <th className="text-left px-4 py-2 font-medium text-gray-600">Last Used</th>
+                        <th className="px-4 py-2" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {apiKeys.map(k => (
+                        <tr key={k.id} className="border-t border-gray-100">
+                          <td className="px-4 py-3 font-mono text-xs text-gray-700">{k.key_prefix}••••••••</td>
+                          <td className="px-4 py-3 text-gray-700">{k.label}</td>
+                          <td className="px-4 py-3 text-gray-500 text-xs">{new Date(k.created_at).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 text-gray-500 text-xs">{k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : 'Never'}</td>
+                          <td className="px-4 py-3 text-right">
+                            <button onClick={() => handleRevokeKey(k.id)} className="text-red-500 hover:text-red-700 text-xs font-medium">Revoke</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         )}

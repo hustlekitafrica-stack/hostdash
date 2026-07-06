@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { canCreateProperty } from '@/lib/plan-limits';
 import { NextRequest, NextResponse } from 'next/server';
 
 function missingEnv() {
@@ -58,6 +59,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: { message: 'Not authenticated. Please log in and try again.' } }, { status: 401 });
     }
     const userId = session.user.id;
+
+    // Enforce plan-based property limit
+    const check = await canCreateProperty(supabase, userId);
+    if (!check.allowed) {
+      return NextResponse.json(
+        { error: { message: `Starter plan allows up to ${check.limit} properties. Upgrade to Pro for unlimited.` } },
+        { status: 403 }
+      );
+    }
 
     const d = await request.json();
 

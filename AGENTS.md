@@ -42,6 +42,15 @@ NEXT_PUBLIC_APP_URL=https://yourdomain.com       # Used to build callback & IPN 
 One-time charge: $45 USD (≈ KSh 6,000). Supports Visa, Mastercard, M-Pesa, Airtel Money.
 On payment confirmation PesaPal POSTs to `/api/pesapal/ipn` → sets `profiles.subscription_status = 'paid'`.
 
+### WhatsApp Business (Twilio — Pro feature)
+
+```
++ WHATSAPP_FROM=wh14155238886atsapp:   # Twilio WhatsApp sandbox number, or your approved WhatsApp sender
+                                        # Uses existing SMS_API_KEY + SMS_USERNAME for Twilio auth
+```
+
+When `WHATSAPP_FROM` is set and the host is on the Pro plan, confirmed bookings trigger WhatsApp notifications to both guest and admin. If absent, WhatsApp calls are silently stubbed.
+
 ### SMS (Africa's Talking — legacy, kept for reference)
 
 ```

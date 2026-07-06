@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { AirbnbPropertyWizard, WizardFormData } from '@/components/properties/AirbnbPropertyWizard';
 import { createClient } from '@/lib/supabase/client';
+import { useSubscription } from '@/lib/use-subscription';
+import { STARTER_PROPERTY_LIMIT } from '@/lib/plan-limits';
 
 type PropStatus = 'active' | 'inactive' | 'maintenance' | 'draft' | 'blocked';
 
@@ -136,9 +139,12 @@ function propertyToWizardData(p: Property): Partial<WizardFormData> {
 }
 
 export default function PropertiesPage() {
+  const router = useRouter();
+  const { isPro, isLoaded: subLoaded } = useSubscription();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [showWizard, setShowWizard] = useState(false);
+  const atLimit = !isPro && properties.length >= STARTER_PROPERTY_LIMIT;
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [continuingProperty, setContinuingProperty] = useState<Property | null>(null);
   const [editWizardData, setEditWizardData] = useState<Partial<WizardFormData> | null>(null);
@@ -617,12 +623,20 @@ export default function PropertiesPage() {
                 Import CSV
               </button>
               <button
-                onClick={() => setShowWizard(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors"
+                onClick={() => atLimit ? router.push('/upgrade') : setShowWizard(true)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                  atLimit
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-gray-900 text-white hover:bg-gray-800'
+                }`}
+                title={atLimit ? `Starter plan allows up to ${STARTER_PROPERTY_LIMIT} properties. Upgrade to Pro for unlimited.` : undefined}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Add Property
+                {atLimit ? 'Upgrade to Pro' : 'Add Property'}
               </button>
+              {atLimit && (
+                <p className="text-xs text-amber-600 mt-1">You've reached the {STARTER_PROPERTY_LIMIT}-property limit on your current plan.</p>
+              )}
             </div>
           </div>
 

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import ChannelManagerTab from '@/components/channel-manager/ChannelManagerTab';
+import { useSubscription } from '@/lib/use-subscription';
+import { ProGate } from '@/components/paywall/ProGate';
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -167,6 +169,7 @@ function addDay(d: Date, n = 1): Date {
 }
 
 export default function BookingCalendarPage() {
+  const { isPro, isLoaded: subLoaded } = useSubscription();
   const [year, setYear] = useState(() => new Date().getFullYear());
   const [month, setMonth] = useState(() => new Date().getMonth());
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -481,7 +484,11 @@ export default function BookingCalendarPage() {
           )}
         </div>
 
-        {activeTab === 'channels' && <ChannelManagerTab properties={properties} />}
+        {activeTab === 'channels' && (
+          <ProGate feature="iCal Channel Sync">
+            <ChannelManagerTab properties={properties} />
+          </ProGate>
+        )}
 
         {activeTab === 'calendar' && (
           <>

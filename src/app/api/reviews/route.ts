@@ -28,6 +28,17 @@ export async function POST(req: NextRequest) {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       hostId = session.user.id;
+
+      // Pro plan check — review requests are a Pro feature
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('subscription_plan, subscription_status')
+        .eq('id', session.user.id)
+        .single();
+      const isPro = profile?.subscription_status === 'paid' && profile?.subscription_plan === 'pro';
+      if (!isPro) {
+        return NextResponse.json({ error: 'Automated review requests require a Pro plan.' }, { status: 403 });
+      }
     }
 
     const { booking_request_id, guest_name, guest_phone, property_id, property_name, stay_dates } = await req.json();
